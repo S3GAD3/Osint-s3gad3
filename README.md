@@ -21,7 +21,7 @@
 
 [![Ver en vivo](https://img.shields.io/badge/🌐_Ver_en_vivo-s3gad3.github.io-00d4ff?style=for-the-badge&logoColor=white)](https://s3gad3.github.io/Osint-s3gad3/)
 [![Licencia](https://img.shields.io/badge/licencia-MIT-10b981?style=for-the-badge)](LICENSE)
-[![Herramientas](https://img.shields.io/badge/herramientas-120+-f59e0b?style=for-the-badge)](https://s3gad3.github.io/Osint-s3gad3/)
+[![Herramientas](https://img.shields.io/badge/herramientas-300+-f59e0b?style=for-the-badge)](https://s3gad3.github.io/Osint-s3gad3/)
 [![Secciones](https://img.shields.io/badge/secciones-17-a78bfa?style=for-the-badge)](https://s3gad3.github.io/Osint-s3gad3/)
 
 </div>
