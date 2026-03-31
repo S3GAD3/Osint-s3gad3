@@ -46,7 +46,6 @@ El objetivo es tener **todas las herramientas en un solo lugar**, organizadas po
 | 📂 **17 secciones** | Organizadas con subcategorías navegables |
 | ℹ️ **Panel de información** | Descripción detallada de cada herramienta |
 | 🔎 **Dorks integrados** | Google dorks por categoría con botón de ejecución directa |
-| ⚙️ **Modo admin** | Editor de enlaces integrado con exportación JSON |
 | 📱 **Responsive** | Funciona en móvil, tablet y escritorio |
 | ⚡ **Sin dependencias** | Un único archivo HTML estático, sin backend |
 
