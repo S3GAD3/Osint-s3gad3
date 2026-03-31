@@ -196,12 +196,6 @@ O acceder directamente en: **[s3gad3.github.io/Osint-s3gad3](https://s3gad3.gith
 
 ---
 
-## Modo Admin
-
-El dashboard incluye un editor de enlaces integrado accesible desde el botón `⚙ Admin` en el header. Permite verificar, editar y actualizar URLs sin tocar el código, con exportación e importación en formato JSON.
-
----
-
 ## Aviso legal
 
 > Este repositorio es una recopilación de enlaces a herramientas y recursos públicos con fines exclusivamente educativos y de investigación legítima en fuentes abiertas (OSINT).
