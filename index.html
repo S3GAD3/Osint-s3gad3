@@ -1,0 +1,1249 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>OSINT · S3GAD3</title>
+<link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;600;700&family=Syne:wght@600;800&display=swap" rel="stylesheet">
+<style>
+:root {
+  --bg:       #07090d;
+  --s1:       #0d1018;
+  --s2:       #131720;
+  --s3:       #191e2a;
+  --b1:       #1d2536;
+  --b2:       #252e42;
+  --text:     #e0e8f4;
+  --text2:    #8599b8;
+  --muted:    #3d5070;
+  --accent:   #00d4ff;
+  --green:    #10b981;
+  --amber:    #f59e0b;
+  --red:      #ef4444;
+  --purple:   #a78bfa;
+  --pink:     #fb7185;
+  --orange:   #fb923c;
+  --teal:     #2dd4bf;
+  --lime:     #84cc16;
+  --sky:      #38bdf8;
+  --rose:     #f43f5e;
+  --yellow:   #fbbf24;
+  --indigo:   #818cf8;
+}
+*{margin:0;padding:0;box-sizing:border-box;}
+html{scroll-behavior:smooth;}
+body{
+  background:var(--bg);color:var(--text);
+  font-family:'JetBrains Mono',monospace;
+  font-size:15px;line-height:1.6;
+  min-height:100vh;overflow-x:hidden;
+}
+body::before{
+  content:'';position:fixed;inset:0;
+  background-image:
+    linear-gradient(rgba(0,212,255,.015) 1px,transparent 1px),
+    linear-gradient(90deg,rgba(0,212,255,.015) 1px,transparent 1px);
+  background-size:52px 52px;pointer-events:none;z-index:0;
+}
+
+/* ── HEADER ─────────────────────────────────────────── */
+header{
+  position:sticky;top:0;z-index:200;
+  background:rgba(7,9,13,.97);backdrop-filter:blur(20px);
+  border-bottom:1px solid var(--b1);
+  padding:0 28px;display:flex;align-items:center;gap:20px;height:60px;
+}
+.logo{
+  font-family:'Syne',sans-serif;font-weight:800;font-size:19px;
+  letter-spacing:.07em;color:var(--accent);
+  text-shadow:0 0 30px rgba(0,212,255,.35);
+  white-space:nowrap;flex-shrink:0;
+}
+.logo em{color:var(--muted);font-style:normal;font-weight:600;}
+.search-wrap{flex:1;max-width:480px;position:relative;}
+#searchInput{
+  width:100%;background:var(--s2);border:1px solid var(--b2);
+  border-radius:8px;padding:9px 36px 9px 38px;
+  color:var(--text);font-family:inherit;font-size:14px;
+  outline:none;transition:border-color .2s,box-shadow .2s;
+}
+#searchInput:focus{border-color:var(--accent);box-shadow:0 0 0 3px rgba(0,212,255,.08);}
+#searchInput::placeholder{color:var(--muted);}
+.s-ico{position:absolute;left:11px;top:50%;transform:translateY(-50%);color:var(--muted);font-size:16px;pointer-events:none;}
+#clearBtn{position:absolute;right:10px;top:50%;transform:translateY(-50%);background:none;border:none;color:var(--muted);font-size:13px;cursor:pointer;display:none;padding:2px 5px;font-family:inherit;}
+#clearBtn:hover{color:var(--text);}
+.hstats{margin-left:auto;font-size:13px;color:var(--muted);white-space:nowrap;flex-shrink:0;}
+.hstats b{color:var(--accent);}
+
+/* ── SECTION NAV ─────────────────────────────────────── */
+.sec-nav{
+  position:sticky;top:60px;z-index:190;
+  background:rgba(7,9,13,.97);backdrop-filter:blur(20px);
+  border-bottom:1px solid var(--b1);
+  padding:0 28px;display:flex;gap:4px;
+  overflow-x:auto;scrollbar-width:none;height:48px;align-items:center;
+}
+.sec-nav::-webkit-scrollbar{display:none;}
+.sec-pill{
+  background:none;border:1px solid transparent;border-radius:20px;
+  padding:5px 14px;font-family:inherit;font-size:12px;
+  color:var(--muted);cursor:pointer;white-space:nowrap;
+  transition:all .15s;letter-spacing:.04em;text-transform:uppercase;
+}
+.sec-pill:hover{color:var(--text);border-color:var(--b2);}
+.sec-pill.active{border-color:currentColor;background:rgba(255,255,255,.04);}
+
+/* ── MAIN ────────────────────────────────────────────── */
+main{position:relative;z-index:1;padding:30px 28px 80px;max-width:1500px;margin:0 auto;}
+
+/* ── SECTION BLOCK ───────────────────────────────────── */
+.sec-block{margin-bottom:48px;animation:fadeUp .3s ease both;}
+.sec-block.hidden{display:none;}
+@keyframes fadeUp{from{opacity:0;transform:translateY(10px)}to{opacity:1;transform:translateY(0)}}
+
+.sec-header{
+  display:flex;align-items:center;gap:12px;
+  margin-bottom:18px;padding-bottom:12px;
+  border-bottom:1px solid var(--b1);
+}
+.sec-num{font-size:11px;color:var(--muted);font-weight:700;letter-spacing:.14em;flex-shrink:0;}
+.sec-title{font-family:'Syne',sans-serif;font-size:16px;font-weight:800;letter-spacing:.09em;text-transform:uppercase;}
+.sec-count{margin-left:auto;font-size:11px;color:var(--muted);background:var(--s2);border:1px solid var(--b1);border-radius:12px;padding:3px 11px;white-space:nowrap;}
+
+/* ── SUB-TABS ────────────────────────────────────────── */
+.sub-tabs{display:flex;gap:6px;flex-wrap:wrap;margin-bottom:16px;}
+.sub-tab{
+  background:none;border:1px solid var(--b1);border-radius:6px;
+  padding:5px 13px;font-family:inherit;font-size:12px;
+  color:var(--muted);cursor:pointer;transition:all .15s;
+  letter-spacing:.04em;white-space:nowrap;
+}
+.sub-tab:hover{color:var(--text);border-color:var(--b2);}
+.sub-tab.active{border-color:currentColor;background:rgba(255,255,255,.04);}
+.sub-panel{display:none;}
+.sub-panel.active{display:block;}
+
+/* ── LINKS GRID ──────────────────────────────────────── */
+.links-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(290px,1fr));gap:6px;}
+
+/* ── LINK CARD ───────────────────────────────────────── */
+.link-card{
+  display:flex;align-items:center;gap:10px;
+  background:var(--s1);border:1px solid var(--b1);
+  border-radius:8px;padding:11px 13px;
+  text-decoration:none;color:var(--text);
+  transition:all .15s;min-width:0;position:relative;
+  cursor:pointer;
+}
+.link-card:hover{background:var(--s2);border-color:var(--hc,var(--accent));transform:translateX(3px);}
+.link-card:hover .lname{color:var(--hc,var(--accent));}
+.link-card:hover .card-arrow{color:var(--hc,var(--accent));}
+.link-favicon{width:16px;height:16px;border-radius:3px;flex-shrink:0;object-fit:contain;}
+.ltext{flex:1;min-width:0;}
+.lname{display:block;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;font-size:14px;transition:color .15s;font-weight:600;}
+.ldesc{display:block;font-size:12px;color:var(--muted);overflow:hidden;text-overflow:ellipsis;white-space:nowrap;margin-top:1px;}
+.card-btns{display:flex;align-items:center;gap:5px;flex-shrink:0;}
+.info-btn{
+  width:20px;height:20px;border-radius:5px;
+  background:var(--s2);border:1px solid var(--b2);
+  color:var(--muted);font-size:11px;cursor:pointer;
+  display:inline-flex;align-items:center;justify-content:center;
+  transition:all .15s;font-family:inherit;font-weight:700;
+  flex-shrink:0;user-select:none;
+}
+.info-btn:hover{background:rgba(0,212,255,.12);border-color:var(--accent);color:var(--accent);}
+.card-arrow{color:var(--b2);font-size:11px;transition:color .15s;}
+
+/* ── TOOLTIP ─────────────────────────────────────────── */
+.tooltip{
+  position:absolute;bottom:calc(100% + 10px);left:50%;
+  transform:translateX(-50%);
+  background:var(--s3);border:1px solid var(--b2);
+  border-radius:8px;padding:10px 14px;
+  font-size:12.5px;color:var(--text2);line-height:1.6;
+  width:270px;z-index:600;pointer-events:none;
+  opacity:0;transition:opacity .15s;
+  box-shadow:0 8px 28px rgba(0,0,0,.6);text-align:left;
+}
+.tooltip::after{
+  content:'';position:absolute;top:100%;left:50%;
+  transform:translateX(-50%);border:6px solid transparent;
+  border-top-color:var(--b2);
+}
+.link-card:hover .tooltip{opacity:1;}
+
+/* ── DORK CARDS ──────────────────────────────────────── */
+.dorks-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(340px,1fr));gap:8px;}
+.dork-card{
+  background:var(--s1);border:1px solid var(--b1);
+  border-radius:8px;padding:12px 14px;display:flex;flex-direction:column;gap:9px;
+}
+.dork-label{font-size:13px;color:var(--text2);font-weight:600;}
+.dork-code{
+  font-size:12px;color:var(--amber);background:var(--s3);
+  border:1px solid var(--b2);border-radius:6px;
+  padding:8px 11px;word-break:break-all;line-height:1.6;
+}
+.dork-actions{display:flex;gap:7px;}
+.dork-btn{
+  flex:1;padding:6px 0;border-radius:6px;font-family:inherit;
+  font-size:12px;cursor:pointer;transition:all .15s;border:1px solid var(--b2);
+}
+.dork-copy{background:var(--s2);color:var(--muted);}
+.dork-copy:hover{border-color:var(--accent);color:var(--accent);}
+.dork-copy.copied{border-color:var(--green);color:var(--green);}
+.dork-run{background:rgba(0,212,255,.08);color:var(--accent);border-color:rgba(0,212,255,.3);}
+.dork-run:hover{background:rgba(0,212,255,.18);}
+
+/* ── TRAINING CARDS ──────────────────────────────────── */
+.training-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(300px,1fr));gap:10px;}
+.training-card{
+  background:var(--s1);border:1px solid var(--b1);
+  border-radius:10px;overflow:hidden;text-decoration:none;
+  color:var(--text);transition:all .2s;display:flex;flex-direction:column;
+}
+.training-card:hover{border-color:var(--accent);transform:translateY(-2px);box-shadow:0 10px 28px rgba(0,0,0,.45);}
+.t-thumb{
+  height:80px;background:var(--s2);
+  display:flex;align-items:center;justify-content:center;
+  position:relative;font-size:30px;color:var(--muted);
+}
+.t-type{
+  position:absolute;top:8px;left:8px;font-size:9px;
+  text-transform:uppercase;letter-spacing:.08em;
+  padding:2px 8px;border-radius:3px;font-weight:700;
+}
+.type-yt{background:rgba(239,68,68,.8);color:#fff;}
+.type-doc{background:rgba(245,158,11,.8);color:#000;}
+.type-course{background:rgba(16,185,129,.8);color:#000;}
+.t-info{padding:12px 14px;flex:1;}
+.t-title{font-size:13.5px;font-weight:700;line-height:1.4;margin-bottom:5px;}
+.t-desc{font-size:12px;color:var(--text2);line-height:1.5;}
+
+/* ── INFO PANEL ──────────────────────────────────────── */
+#infoPanel{
+  position:fixed;right:0;top:0;bottom:0;width:340px;z-index:1000;
+  background:var(--s1);border-left:1px solid var(--b2);
+  transform:translateX(100%);
+  transition:transform .25s cubic-bezier(.4,0,.2,1);
+  display:flex;flex-direction:column;
+  box-shadow:-12px 0 40px rgba(0,0,0,.6);
+  pointer-events:none;
+}
+#infoPanel.open{transform:translateX(0);pointer-events:all;}
+.panel-hdr{
+  padding:20px 20px 16px;border-bottom:1px solid var(--b1);
+  display:flex;align-items:flex-start;gap:12px;
+}
+.panel-fav{width:24px;height:24px;border-radius:5px;object-fit:contain;flex-shrink:0;}
+.panel-tw{flex:1;min-width:0;}
+.panel-title{font-family:'Syne',sans-serif;font-size:14px;font-weight:800;line-height:1.3;}
+.panel-domain{font-size:11px;color:var(--muted);margin-top:3px;}
+.panel-close{
+  background:none;border:1px solid var(--b2);border-radius:5px;
+  color:var(--muted);font-size:14px;cursor:pointer;
+  padding:4px 9px;font-family:inherit;transition:all .15s;flex-shrink:0;
+}
+.panel-close:hover{color:var(--text);}
+.panel-body{flex:1;overflow-y:auto;padding:18px 20px;}
+.plabel{font-size:10px;color:var(--muted);text-transform:uppercase;letter-spacing:.1em;margin-bottom:8px;}
+.pdesc{
+  font-size:13px;line-height:1.7;color:var(--text2);
+  background:var(--s2);border:1px solid var(--b1);
+  border-radius:7px;padding:12px 14px;margin-bottom:16px;
+}
+.ptags{display:flex;flex-wrap:wrap;gap:5px;margin-bottom:18px;}
+.ptag{font-size:11px;padding:3px 10px;border-radius:12px;border:1px solid var(--b2);color:var(--muted);background:var(--s2);}
+.panel-go{
+  display:flex;align-items:center;justify-content:center;gap:8px;
+  width:100%;padding:12px;background:rgba(0,212,255,.1);
+  border:1px solid var(--accent);border-radius:8px;
+  color:var(--accent);font-family:inherit;font-size:13px;
+  cursor:pointer;text-decoration:none;transition:all .15s;font-weight:700;
+}
+.panel-go:hover{background:rgba(0,212,255,.2);}
+
+/* ── NO RESULTS ──────────────────────────────────────── */
+.no-results{text-align:center;color:var(--muted);font-size:15px;padding:70px 0;}
+.no-results b{color:var(--accent);}
+
+/* ── SCROLLBAR ───────────────────────────────────────── */
+::-webkit-scrollbar{width:5px;height:5px;}
+::-webkit-scrollbar-track{background:var(--bg);}
+::-webkit-scrollbar-thumb{background:var(--b2);border-radius:3px;}
+::-webkit-scrollbar-thumb:hover{background:var(--muted);}
+
+/* ── RESPONSIVE ──────────────────────────────────────── */
+@media(max-width:700px){
+  header{padding:0 14px;gap:12px;}
+  .hstats{display:none;}
+  main{padding:20px 14px 60px;}
+  .sec-nav{padding:0 14px;}
+  .links-grid,.dorks-grid,.training-grid{grid-template-columns:1fr;}
+  #infoPanel{width:100%;}
+}
+</style>
+</head>
+<body>
+
+<header>
+  <div class="logo">OSINT <em>·</em> S3GAD3</div>
+  <div class="search-wrap">
+    <span class="s-ico">⌕</span>
+    <input type="text" id="searchInput" placeholder="Buscar herramienta..." autocomplete="off" spellcheck="false">
+    <button id="clearBtn">✕</button>
+  </div>
+  <div class="hstats">Total: <b id="totalCount">0</b> &nbsp;|&nbsp; <span id="searchInfo" style="display:none">Resultados: <b id="foundCount">0</b></span></div>
+</header>
+
+<nav class="sec-nav" id="secNav">
+  <button class="sec-pill active" data-sec="all">Todas</button>
+</nav>
+
+<main id="main"></main>
+
+<!-- INFO PANEL -->
+<div id="infoPanel">
+  <div class="panel-hdr">
+    <img class="panel-fav" id="pFav" src="" alt="">
+    <div class="panel-tw">
+      <div class="panel-title" id="pTitle"></div>
+      <div class="panel-domain" id="pDomain"></div>
+    </div>
+    <button class="panel-close" id="panelClose">✕</button>
+  </div>
+  <div class="panel-body">
+    <div class="plabel">¿Para qué sirve?</div>
+    <div class="pdesc" id="pDesc"></div>
+    <div class="plabel">Categorías</div>
+    <div class="ptags" id="pTags"></div>
+    <a class="panel-go" id="pLink" href="#" target="_blank" rel="noopener">↗ Abrir herramienta</a>
+  </div>
+</div>
+
+<script>
+// ═══════════════════════════════════════════════════════════
+// DATA
+// ═══════════════════════════════════════════════════════════
+const SECTIONS = [
+{
+  id:'s01',num:'01',title:'Buscadores y Plataformas',color:'#00d4ff',
+  subs:[
+    {label:'Buscadores Generales',links:[
+      {name:'All-io',url:'https://all-io.net',desc:'Metabuscador que lanza la consulta simultáneamente en Google, Bing, Yahoo, DuckDuckGo y otros.',tags:['metabuscador','simultáneo']},
+      {name:'DuckDuckGo',url:'https://duckduckgo.com',desc:'Buscador privado sin rastreo de usuario. Ideal para búsquedas anónimas en investigaciones.',tags:['privacidad','buscador']},
+      {name:'Carrot2',url:'https://search.carrot2.org/#/search/web',desc:'Buscador que organiza los resultados en clústeres temáticos para facilitar el análisis.',tags:['clústeres','análisis','resultados']},
+      {name:'Google Scorza',url:'https://cse.google.com/cse?cx=d28c23ec014bd4cca#gsc.tab=0',desc:'Motor de búsqueda personalizado de Google orientado a investigación OSINT.',tags:['google','osint','cse']},
+      {name:'Búsqueda archivos en la nube',url:'https://cse.google.com/cse?cx=f466f6ea4886845d1',desc:'Motor CSE de Google especializado en localizar archivos alojados en servicios de nube pública.',tags:['archivos','nube','google']},
+      {name:'Perplexity AI',url:'https://www.perplexity.ai',desc:'IA de búsqueda que responde con fuentes citadas en tiempo real. Útil para síntesis rápida.',tags:['IA','síntesis','tiempo real']},
+      {name:'Búsqueda Google Avanzada',url:'https://www.google.com/advanced_search',desc:'Formulario para construir búsquedas avanzadas con operadores sin escribirlos manualmente.',tags:['google','dorks','avanzado']},
+    ]},
+    {label:'Plataformas Multiherramienta',links:[
+      {name:'OSINT Industries',url:'https://osint.industries',desc:'Plataforma que correlaciona email, teléfono y usuario con decenas de servicios registrados.',tags:['correlación','email','teléfono']},
+      {name:'OSINT Rocks',url:'https://osint.rocks',desc:'Conjunto de herramientas OSINT rápidas: lookup de email, teléfono, usuario y dominio.',tags:['multiherramienta','lookup','rápido']},
+      {name:'Analyst Research Tools',url:'https://analystresearchtools.com',desc:'Colección curada de herramientas para analistas de inteligencia y periodistas de investigación.',tags:['analistas','inteligencia','colección']},
+      {name:'OSINT Framework',url:'https://osintframework.com',desc:'Árbol interactivo con cientos de herramientas OSINT organizadas por tipo de investigación.',tags:['framework','directorio','referencia']},
+      {name:'OSINT.sh',url:'https://osint.sh',desc:'Plataforma con múltiples herramientas integradas: subdominios, emails, IPs, certificados SSL.',tags:['multiherramienta','dominio','email']},
+      {name:'Synapsint',url:'https://synapsint.com',desc:'Herramienta OSINT que combina búsqueda de IPs, dominios, emails y teléfonos en una sola interfaz.',tags:['IP','dominio','email','teléfono']},
+    ]},
+    {label:'Búsqueda en Código y Archivos',links:[
+      {name:'GitHub OSINT',url:'https://github.com/sinwindie/OSINT/find/master',desc:'Repositorio con colección de herramientas y recursos OSINT organizados para investigadores.',tags:['github','repositorio','recursos']},
+      {name:'Grep.app',url:'https://grep.app',desc:'Búsqueda de código fuente en repositorios GitHub públicos. Localiza credenciales o datos expuestos.',tags:['código','github','credenciales']},
+      {name:'PublicWWW',url:'https://publicwww.com',desc:'Motor que busca en el código fuente de páginas web. Encuentra webs con un script o fragmento concreto.',tags:['código fuente','web','análisis']},
+    ]},
+    {label:'🔍 Dorks',isDorks:true,dorks:[
+      {label:'Archivos PDF con datos personales expuestos',query:'filetype:pdf "confidencial" OR "datos personales" site:*.es'},
+      {label:'Hojas Excel con datos filtrados',query:'filetype:xlsx "DNI" OR "NIF" OR "contraseña" OR "password"'},
+      {label:'Directorios web abiertos',query:'intitle:"index of" "parent directory" -site:github.com'},
+      {label:'Archivos de configuración expuestos',query:'filetype:env OR filetype:cfg "password" OR "API_KEY"'},
+      {label:'Documentos de licitaciones públicas España',query:'site:contrataciondelestado.es filetype:pdf'},
+      {label:'Cámaras IP expuestas en internet',query:'intitle:"webcamXP" OR intitle:"IP Camera" inurl:"/view.shtml"'},
+      {label:'Bases de datos expuestas',query:'intitle:"phpMyAdmin" inurl:"/phpmyadmin/" "Welcome to phpMyAdmin"'},
+    ]},
+  ]
+},
+{
+  id:'s02',num:'02',title:'Personas',color:'#60a5fa',
+  subs:[
+    {label:'Búsqueda de Personas',links:[
+      {name:'WebMii',url:'https://webmii.com',desc:'Busca información pública de personas en internet: fotos, perfiles sociales, artículos y más.',tags:['personas','perfiles','búsqueda']},
+      {name:'NAMINT',url:'https://seintpl.github.io/NAMINT/',desc:'Genera combinaciones de nombres de usuario a partir de nombre y apellidos para buscar en redes.',tags:['username','combinaciones','nombre']},
+      {name:'Búsqueda en redes sociales (CSE)',url:'https://cse.google.com/cse?cx=001580308195336108602:oyrkxatrfyq',desc:'Motor CSE de Google que busca simultáneamente en varias redes sociales.',tags:['redes sociales','simultáneo','google']},
+      {name:'uFind.name',url:'https://ufind.name',desc:'Busca perfiles de una persona en redes sociales, foros y webs usando su nombre completo.',tags:['nombre','redes','foros']},
+      {name:'Thatsthem',url:'https://thatsthem.com',desc:'Directorio de personas en EE.UU. que correlaciona nombre, email, teléfono, dirección e IP.',tags:['personas','EE.UU.','directorio']},
+      {name:'Spokeo',url:'https://www.spokeo.com',desc:'Agregador de información pública: redes sociales, registros públicos, historial de direcciones.',tags:['personas','registros','redes']},
+      {name:'Pipl',url:'https://pipl.com',desc:'Motor de búsqueda de identidades digitales que correlaciona datos de múltiples fuentes.',tags:['identidad','correlación','perfil']},
+      {name:'Free People Search Tool',url:'https://freepeoplesearchtool.com/#gsc.tab=0',desc:'Herramienta gratuita para buscar personas en directorios públicos de EE.UU.',tags:['personas','EE.UU.','gratuito']},
+      {name:'BOE.es',url:'https://www.boe.es',desc:'Boletín Oficial del Estado español. Busca personas en sanciones, resoluciones judiciales y registros.',tags:['españa','oficial','judicial']},
+    ]},
+    {label:'Variantes de Nombre',links:[
+      {name:'Bellingcat Name Variant Search',url:'https://bellingcat.github.io/name-variant-search/#gsc.tab=0',desc:'Genera variantes de un nombre en diferentes idiomas y sistemas de escritura para búsqueda global.',tags:['nombres','idiomas','bellingcat']},
+      {name:'Forebears.io',url:'https://forebears.io',desc:'Distribución geográfica de apellidos y nombres. Estima el origen nacional de un sujeto.',tags:['apellidos','origen','demografía']},
+    ]},
+    {label:'Superficie de Ataque',links:[
+      {name:'Person OSINT Attack Surface',url:'https://github.com/sinwindie/OSINT/blob/master/Person/Person%20OSINT%20Attack%20Surface.pdf',desc:'Diagrama completo de la superficie de ataque OSINT sobre una persona: todos los vectores de búsqueda.',tags:['superficie ataque','diagrama','referencia']},
+      {name:'FilePhish',url:'https://greylensresearch.github.io/filephish/',desc:'Genera dorks de Google automáticamente para buscar archivos PDF, XLSX, DOCX sobre un objetivo.',tags:['dorks','archivos','google']},
+      {name:'Social Searcher',url:'https://www.social-searcher.com/unofficial-search/',desc:'Monitoriza y busca menciones en redes sociales en tiempo real sin necesidad de cuenta.',tags:['redes sociales','monitorización','menciones']},
+    ]},
+    {label:'🔍 Dorks',isDorks:true,dorks:[
+      {label:'Persona en documentos oficiales España',query:'site:boe.es "NOMBRE APELLIDO"'},
+      {label:'Perfil LinkedIn de persona',query:'site:linkedin.com/in/ "nombre apellido" "España"'},
+      {label:'CV o currículum expuesto',query:'"curriculum vitae" OR "currículum" filetype:pdf "nombre" "teléfono"'},
+      {label:'Email corporativo de persona',query:'"nombre.apellido@" site:*.es filetype:pdf OR filetype:doc'},
+      {label:'Persona en contratos públicos',query:'site:contrataciondelestado.es "nombre apellido"'},
+      {label:'Persona en noticias de prensa',query:'"nombre apellido" site:elpais.com OR site:elmundo.es OR site:abc.es'},
+    ]},
+  ]
+},
+{
+  id:'s03',num:'03',title:'Teléfonos',color:'#10b981',
+  subs:[
+    {label:'Búsqueda e Identificación',links:[
+      {name:'OSINT Industries',url:'https://osint.industries',desc:'Correlaciona un número de teléfono con cuentas registradas en decenas de servicios online.',tags:['teléfono','correlación','servicios']},
+      {name:'Epieos',url:'https://epieos.com',desc:'A partir de un teléfono o email obtiene servicios registrados, cuenta Google y redes sociales.',tags:['teléfono','email','google']},
+      {name:'HaveIBeenPwned',url:'https://haveibeenpwned.com',desc:'Comprueba si un email o teléfono ha aparecido en filtraciones de datos conocidas.',tags:['filtraciones','seguridad']},
+      {name:'Castrick',url:'https://castrickclues.com',desc:'Herramienta OSINT para investigar números de teléfono: operadora, ubicación y perfiles asociados.',tags:['teléfono','operadora','perfiles']},
+      {name:'Phone Number Query Constructor',url:'https://jarvis2ultron.github.io/phonenumberqueryconstructor/',desc:'Genera automáticamente búsquedas en Google para distintas variantes de un número de teléfono.',tags:['dorks','variantes','google']},
+      {name:'Phone Variant Search',url:'https://www.no-nonsense-intel.com/phone-variant-search',desc:'Busca todas las variantes de formato de un número telefónico en internet simultáneamente.',tags:['variantes','formato','búsqueda']},
+      {name:'WhatsApp Check Leaked',url:'https://whatsapp.checkleaked.cc',desc:'Verifica si un número de WhatsApp está vinculado a filtraciones de datos conocidas.',tags:['whatsapp','filtraciones','verificación']},
+      {name:'TrueCaller Bot (Telegram)',url:'https://t.me/TrueCalleRobot',desc:'Bot de Telegram que consulta la base de datos de Truecaller para identificar titulares de números.',tags:['truecaller','telegram','bot']},
+      {name:'Universal Free Bot (Telegram)',url:'https://t.me/Universal_FreeBot',desc:'Bot de Telegram multi-función: lookup de teléfono, email y usuario en múltiples fuentes.',tags:['telegram','bot','lookup']},
+      {name:'Veriphone',url:'https://veriphone.io',desc:'Valida y obtiene información de números telefónicos internacionales: operadora, tipo y país.',tags:['validación','operadora','internacional']},
+      {name:'Free Carrier Lookup',url:'https://www.freecarrierlookup.com',desc:'Identifica la operadora de telefonía de cualquier número en EE.UU. y otros países.',tags:['operadora','EE.UU.','gratuito']},
+      {name:'Country Codes',url:'https://countrycode.org',desc:'Referencia completa de prefijos telefónicos internacionales por país.',tags:['prefijos','países','referencia']},
+    ]},
+    {label:'Portabilidad España',links:[
+      {name:'CNMC Portabilidad Móvil',url:'https://numeracionyoperadores.cnmc.es/portabilidad/movil',desc:'Consulta oficial de la CNMC para identificar la operadora actual de un número móvil en España.',tags:['cnmc','portabilidad','españa']},
+      {name:'CNMC Portabilidad Fija',url:'https://numeracionyoperadores.cnmc.es/portabilidad/fija',desc:'Consulta oficial de la CNMC para identificar la operadora de un número fijo en España.',tags:['cnmc','portabilidad','fija']},
+      {name:'DLTCode Operadora',url:'https://dltcode.es/de-que-operador-es-un-numero',desc:'Herramienta española para identificar la operadora de un número por su prefijo de numeración.',tags:['operadora','españa','prefijo']},
+    ]},
+    {label:'IMEI',links:[
+      {name:'IMEI.info',url:'https://www.imei.info',desc:'Busca información del dispositivo por IMEI: marca, modelo, país de origen y estado de bloqueo.',tags:['IMEI','dispositivo','modelo']},
+      {name:'IMEI Calculadora',url:'https://www.imei.info/calc/',desc:'Calcula y valida IMEIs usando el algoritmo de Luhn. Útil para verificar si un IMEI es válido.',tags:['IMEI','validación','luhn']},
+      {name:'IMEI24 Blacklist Check',url:'https://imei24.com/blacklist_check/',desc:'Comprueba si un IMEI está en listas negras internacionales por robo o fraude.',tags:['IMEI','lista negra','robo']},
+      {name:'GSMA Device Check',url:'https://devicecheck.gsma.com',desc:'Servicio oficial GSMA para verificar si un dispositivo está reportado como robado o perdido.',tags:['GSMA','oficial','robo']},
+    ]},
+    {label:'HLR y Estado SIM',links:[
+      {name:'SMSC HLR Lookup',url:'https://m.smsc.ru/testhlr/',desc:'Consulta HLR (Home Location Register) para verificar si un número está activo y en qué red.',tags:['HLR','activo','red']},
+      {name:'IPQualityScore HLR',url:'https://www.ipqualityscore.com/free-hlr-lookup/',desc:'Lookup HLR gratuito que verifica el estado de un número: activo, portado, prepago o contrato.',tags:['HLR','estado','prepago']},
+    ]},
+    {label:'Artículos y Guías',links:[
+      {name:'Guía WhatsApp OSINT',url:'https://telegra.ph/C%C3%B3mo-obtener-informaci%C3%B3n-de-WhatsApp-a-partir-de-un-n%C3%BAmero-de-tel%C3%A9fono-06-03',desc:'Guía completa sobre cómo obtener información de WhatsApp a partir de un número de teléfono.',tags:['whatsapp','guía','tutorial']},
+      {name:'Guía Telegram desde teléfono',url:'https://telegra.ph/C%C3%B3mo-obtener-informaci%C3%B3n-de-perfil-de-Telegram-a-partir-de-un-n%C3%BAmero-de-tel%C3%A9fono-06-03',desc:'Técnicas para obtener el perfil de Telegram de una persona a partir de su número telefónico.',tags:['telegram','guía','perfil']},
+      {name:'Teléfono a usuario UBER',url:'https://telegra.ph/De-un-n%C3%BAmero-de-tel%C3%A9fono-a-conocer-el-nombre-de-usuario-de-UBER-asociado-06-17',desc:'Técnica para vincular un número de teléfono con el nombre de usuario de UBER asociado.',tags:['uber','técnica','usuario']},
+      {name:'Advanced Phone Number OSINT',url:'https://medium.com/@marvelous678/advanced-phone-number-osint-ddabfe3d0bb5',desc:'Artículo avanzado sobre técnicas OSINT aplicadas a la investigación de números telefónicos.',tags:['avanzado','técnicas','artículo']},
+    ]},
+    {label:'🔍 Dorks',isDorks:true,dorks:[
+      {label:'Número móvil español en redes sociales',query:'"6XX XXX XXX" OR "+346XXXXXXXXX" site:facebook.com OR site:twitter.com'},
+      {label:'Teléfono en documentos PDF españoles',query:'filetype:pdf "+34 6" site:*.es'},
+      {label:'Número en foros españoles',query:'"6XX XXX XXX" site:forocoches.com OR site:elotrolado.net OR site:mediavida.com'},
+      {label:'Teléfono en páginas empresariales',query:'"tel:" OR "teléfono:" "+34 6" site:*.es'},
+      {label:'Número en WHOIS de dominios',query:'site:whois.domaintools.com "+34 6"'},
+      {label:'Teléfono en registros oficiales',query:'"teléfono" "6XX" site:boe.es OR site:borme.es'},
+    ]},
+  ]
+},
+{
+  id:'s04',num:'04',title:'Correos Electrónicos',color:'#f59e0b',
+  subs:[
+    {label:'Búsqueda e Identificación',links:[
+      {name:'OSINT Industries',url:'https://osint.industries',desc:'A partir de un email obtiene servicios registrados, cuenta Google, redes sociales y más.',tags:['email','google','redes']},
+      {name:'Epieos',url:'https://epieos.com',desc:'Busca servicios vinculados a un email: cuentas de Google, calendarios, redes sociales.',tags:['email','google','servicios']},
+      {name:'Universal Free Bot',url:'https://t.me/Universal_FreeBot',desc:'Bot de Telegram para lookup de emails: filtraciones, servicios registrados y más.',tags:['telegram','bot','email']},
+      {name:'Avatarapi',url:'https://avatarapi.com/',desc:'Obtiene el avatar o foto de perfil asociada a un email en servicios como Gravatar.',tags:['avatar','gravatar','foto']},
+      {name:'Digital Footprint Check',url:'https://digitalfootprintcheck.com/free-breach-checker.html',desc:'Comprueba la huella digital de un email: filtraciones, registros y presencia en webs.',tags:['huella digital','filtraciones','email']},
+      {name:'User Email Enrichment',url:'https://taitems.github.io/user-email-enrichment/',desc:'Enriquece un email con información de perfiles asociados en múltiples plataformas.',tags:['enriquecimiento','perfiles','email']},
+      {name:'Hunter.io',url:'https://hunter.io',desc:'Encuentra emails corporativos de una empresa por dominio y verifica si existen.',tags:['empresa','verificación','dominio']},
+      {name:'Emailrep.io',url:'https://emailrep.io',desc:'Analiza reputación de un email: antigüedad, presencia en redes, filtraciones y credibilidad.',tags:['reputación','análisis']},
+      {name:'Proxynova COMB',url:'https://www.proxynova.com/tools/comb/',desc:'Busca en la base de datos COMB (Compilation of Many Breaches) por email o usuario.',tags:['COMB','filtraciones','base de datos']},
+      {name:'Skymem',url:'https://www.skymem.info',desc:'Busca emails en listados de correos empresariales y directorios públicos.',tags:['emails','empresas','directorio']},
+    ]},
+    {label:'Análisis de Cabeceras',links:[
+      {name:'MXToolbox Email Headers',url:'https://mxtoolbox.com/EmailHeaders.aspx',desc:'Analiza cabeceras de email para rastrear el origen real, servidores intermedios y SPF/DKIM.',tags:['cabeceras','SPF','DKIM','técnico']},
+      {name:'Google Messageheader',url:'https://toolbox.googleapps.com/apps/messageheader/analyzeheader',desc:'Herramienta oficial de Google para analizar cabeceras de correo y detectar anomalías.',tags:['cabeceras','google','oficial']},
+      {name:'IPTrackerOnline Email Headers',url:'https://www.iptrackeronline.com/email-header-analysis.php',desc:'Analiza cabeceras de email con geolocalización de IPs de los servidores de origen.',tags:['cabeceras','geolocalización','IP']},
+      {name:'MHA Azure',url:'https://mha.azurewebsites.net/',desc:'Analizador de cabeceras de email con visualización clara del recorrido del mensaje.',tags:['cabeceras','visualización','recorrido']},
+      {name:'Email Header Spreadsheet',url:'https://docs.google.com/spreadsheet/ccc?key=0AoW7aksoVU98dGNFSUtfeXg4akpNTWM0Z2pHWjJzZUE#gid=0',desc:'Hoja de cálculo de referencia para interpretar campos de cabeceras de correo electrónico.',tags:['cabeceras','referencia','guía']},
+    ]},
+    {label:'Fugas y Filtraciones',links:[
+      {name:'HaveIBeenPwned',url:'https://haveibeenpwned.com',desc:'Comprueba si un email aparece en filtraciones de datos públicas conocidas.',tags:['filtraciones','seguridad']},
+      {name:'Cybernews Leak Check',url:'https://cybernews.com/personal-data-leak-check/',desc:'Comprobador de filtraciones de datos con base de datos actualizada de brechas de seguridad.',tags:['filtraciones','cybernews','verificación']},
+      {name:'Breachdirectory',url:'https://breachdirectory.org',desc:'Busca emails en filtraciones y muestra contraseñas parciales hasheadas asociadas.',tags:['filtraciones','contraseñas','hash']},
+    ]},
+    {label:'🔍 Dorks',isDorks:true,dorks:[
+      {label:'Email en documentos PDF públicos',query:'"@gmail.com" OR "@hotmail.com" filetype:pdf site:*.es'},
+      {label:'Emails corporativos expuestos',query:'"@empresa.es" filetype:pdf OR filetype:xlsx OR filetype:doc'},
+      {label:'Email en registros WHOIS',query:'site:whois.domaintools.com "@gmail.com" "registrant"'},
+      {label:'Email en filtraciones Pastebin',query:'site:pastebin.com "@" "password" OR "contraseña"'},
+      {label:'Emails en documentos de licitaciones',query:'"@" "correo" OR "email" site:contrataciondelestado.es filetype:pdf'},
+    ]},
+  ]
+},
+{
+  id:'s05',num:'05',title:'Nombres de Usuario',color:'#a78bfa',
+  subs:[
+    {label:'Búsqueda Masiva',links:[
+      {name:'WhatsMyName (Streamlit)',url:'https://whatsmyname.streamlit.app',desc:'Versión web de WhatsMyName. Busca un nombre de usuario en +600 plataformas sin instalar nada.',tags:['masivo','600 plataformas','web']},
+      {name:'WhatsMyName App',url:'https://whatsmyname.app',desc:'Herramienta principal de búsqueda de username en más de 600 plataformas simultáneamente.',tags:['masivo','open source','600 redes']},
+      {name:'UserSearch.org',url:'https://usersearch.org',desc:'Busca un nombre de usuario en cientos de redes sociales, foros y plataformas.',tags:['masivo','redes','foros']},
+      {name:'IDCrawl Username',url:'https://www.idcrawl.com/username-search',desc:'Busca perfiles de una persona por nombre de usuario en cientos de servicios online.',tags:['perfiles','búsqueda masiva','servicios']},
+      {name:'Sherlock',url:'https://github.com/sherlock-project/sherlock',desc:'Script Python que busca un nombre de usuario en más de 300 redes sociales.',tags:['python','open source','300 redes']},
+    ]},
+    {label:'Verificación y Disponibilidad',links:[
+      {name:'Instant Username',url:'https://instantusername.com/#/',desc:'Comprobación instantánea de disponibilidad de nombre de usuario en las principales plataformas.',tags:['disponibilidad','instantáneo']},
+      {name:'Namecheckup',url:'https://namecheckup.com',desc:'Verifica si un nombre de usuario está registrado en redes sociales, apps y dominios.',tags:['verificación','disponibilidad']},
+      {name:'Namevine',url:'https://namevine.com',desc:'Busca un nombre en Twitter, Facebook, YouTube, Instagram y dominio .com simultáneamente.',tags:['disponibilidad','redes principales']},
+      {name:'Breachdirectory',url:'https://breachdirectory.org',desc:'Busca nombres de usuario en filtraciones de datos y bases de datos comprometidas.',tags:['filtraciones','comprometido']},
+      {name:'IntelX Username',url:'https://intelx.io/tools?tab=username',desc:'Busca un nombre de usuario en filtraciones, pastes y dark web de la base de datos IntelX.',tags:['darkweb','filtraciones','intelx']},
+    ]},
+    {label:'🔍 Dorks',isDorks:true,dorks:[
+      {label:'Usuario en múltiples redes',query:'"nombreusuario" site:twitter.com OR site:instagram.com OR site:reddit.com'},
+      {label:'Usuario en Pastebin y pastes',query:'site:pastebin.com "nombreusuario"'},
+      {label:'Perfil GitHub de usuario',query:'site:github.com "nombreusuario"'},
+      {label:'Usuario en comentarios YouTube',query:'site:youtube.com "nombreusuario"'},
+      {label:'Usuario en foros de filtraciones',query:'"nombreusuario" site:raidforums.com OR site:breachforums.com OR site:nulled.to'},
+    ]},
+  ]
+},
+{
+  id:'s06',num:'06',title:'Redes Sociales · SOCMINT',color:'#fb7185',
+  subs:[
+    {label:'Instagram',links:[
+      {name:'TikVib Instagram',url:'https://www.tikvib.com',desc:'Herramienta para ver y analizar perfiles y contenidos de Instagram de forma anónima.',tags:['instagram','anónimo','análisis']},
+      {name:'Commentpicker Username',url:'https://commentpicker.com/instagram-username.php',desc:'Obtiene el nombre de usuario de Instagram a partir del User ID numérico.',tags:['instagram','username','ID']},
+      {name:'Imginn',url:'https://imginn.com',desc:'Visualiza y descarga fotos, vídeos e historias de Instagram de forma completamente anónima.',tags:['instagram','anónimo','descarga']},
+      {name:'OSINT Combine Instagram',url:'https://www-osintcombine-com.filesusr.com/html/c17c29_845bc86cbcd4952322d48068cdbb8f11.html',desc:'Herramienta de OSINTCombine para búsqueda avanzada en Instagram por hashtag, ubicación y usuario.',tags:['instagram','búsqueda avanzada','hashtag']},
+      {name:'Osintgram',url:'https://github.com/Datalux/Osintgram',desc:'Herramienta open source para análisis OSINT de perfiles Instagram: seguidores, fotos, ubicaciones.',tags:['instagram','open source','análisis']},
+      {name:'Picnob',url:'https://www.picnob.com',desc:'Visor y descargador de contenido Instagram sin cuenta. Historias, posts y reels.',tags:['instagram','visor','descarga']},
+      {name:'InstaHunt',url:'https://instahunt.huntintel.io',desc:'Herramienta de HuntIntel para investigación OSINT en perfiles de Instagram.',tags:['instagram','huntintel','investigación']},
+      {name:'Dumpor',url:'https://dumpor.io',desc:'Ver y descargar contenido de Instagram de forma anónima sin necesidad de cuenta.',tags:['instagram','anónimo','descarga']},
+      {name:'One-plus Instagram',url:'https://one-plus.github.io/Instagram',desc:'Colección de herramientas OSINT para Instagram: búsqueda por ID, usuario, hashtag y más.',tags:['instagram','colección','herramientas']},
+      {name:'Commentpicker User ID',url:'https://commentpicker.com/instagram-user-id.php',desc:'Obtiene el ID numérico de una cuenta de Instagram a partir del nombre de usuario.',tags:['instagram','user ID','técnico']},
+      {name:'AnonyIG',url:'https://anonyig.com/es/',desc:'Visualizador anónimo de historias y perfiles de Instagram en español.',tags:['instagram','historias','anónimo']},
+      {name:'Flufi',url:'https://flufi.me',desc:'Herramienta para ver historias y contenido de Instagram de forma anónima.',tags:['instagram','historias','anónimo']},
+    ]},
+    {label:'Facebook',links:[
+      {name:'Lookup-ID Facebook',url:'https://lookup-id.com',desc:'Obtiene el ID numérico de perfiles, páginas y grupos de Facebook a partir de la URL.',tags:['facebook','ID','técnico']},
+      {name:'Find Facebook ID',url:'https://www.codeofaninja.com/tools/find-facebook-id/',desc:'Herramienta alternativa para encontrar el ID de usuario o página de Facebook.',tags:['facebook','ID','técnico']},
+      {name:'Facebook Login Identify',url:'https://www.facebook.com/login/identify',desc:'Técnica OSINT: al introducir un teléfono en la recuperación de contraseña se puede identificar la cuenta.',tags:['facebook','técnica','identificación']},
+      {name:'WhoPostedWhat',url:'https://whopostedwhat.com',desc:'Búsqueda avanzada de publicaciones en Facebook por fecha, usuario o palabras clave.',tags:['facebook','búsqueda','publicaciones']},
+    ]},
+    {label:'TikTok',links:[
+      {name:'TikVib',url:'https://www.tikvib.com',desc:'Análisis de perfiles y tendencias de TikTok: seguidores, engagement y contenido.',tags:['tiktok','análisis','perfil']},
+      {name:'URLBird',url:'https://urlebird.com/es/',desc:'Busca y analiza vídeos, usuarios y hashtags de TikTok sin necesidad de cuenta.',tags:['tiktok','búsqueda','hashtag']},
+      {name:'SSSTik',url:'https://ssstik.io/es',desc:'Descargador de vídeos de TikTok sin marca de agua, directamente por URL.',tags:['tiktok','descarga','vídeo']},
+      {name:'Mavekite',url:'https://mavekite.com',desc:'Herramienta de análisis de cuentas de TikTok: estadísticas, contenido y evolución.',tags:['tiktok','estadísticas','análisis']},
+      {name:'Guía OSINT TikTok',url:'https://www.secjuice.com/osint-investigations-on-tiktok/',desc:'Artículo completo sobre técnicas de investigación OSINT aplicadas a TikTok.',tags:['tiktok','guía','técnicas']},
+    ]},
+    {label:'LinkedIn',links:[
+      {name:'RocketReach',url:'https://rocketreach.co/person',desc:'Encuentra emails y teléfonos de profesionales a partir de su perfil de LinkedIn.',tags:['linkedin','emails','contacto']},
+      {name:'Guía búsqueda avanzada LinkedIn',url:'https://nubela.co/blog/how-to-find-anyone-with-an-advanced-linkedin-people-search/',desc:'Guía completa para usar la búsqueda avanzada de personas en LinkedIn al máximo.',tags:['linkedin','búsqueda avanzada','guía']},
+      {name:'LinkedIn CSE Google',url:'https://cse.google.com/cse?cx=012951739560700154499:8rl_7tkzjgq#gsc.tab=0',desc:'Motor CSE de Google especializado en buscar perfiles de LinkedIn.',tags:['linkedin','google','cse']},
+    ]},
+    {label:'YouTube',links:[
+      {name:'Filmot',url:'https://filmot.com',desc:'Busca en los subtítulos de millones de vídeos de YouTube por palabras clave.',tags:['youtube','subtítulos','búsqueda']},
+      {name:'YouTube Lookup',url:'https://youtube-lookup.vercel.app',desc:'Obtiene metadatos detallados de un vídeo o canal de YouTube por su ID o URL.',tags:['youtube','metadatos','lookup']},
+      {name:'YouTube Geofind (Location)',url:'https://mattw.io/youtube-geofind/location',desc:'Busca vídeos de YouTube publicados cerca de unas coordenadas geográficas específicas.',tags:['youtube','geolocalización','ubicación']},
+      {name:'YouTube Metadata',url:'https://mattw.io/youtube-metadata/',desc:'Extrae todos los metadatos disponibles de un vídeo de YouTube: fechas, IDs, estadísticas.',tags:['youtube','metadatos','técnico']},
+      {name:'YouTube Geofind',url:'https://mattw.io/youtube-geofind/',desc:'Busca vídeos de YouTube por área geográfica en un mapa interactivo.',tags:['youtube','mapa','geolocalización']},
+    ]},
+    {label:'Twitter / X',links:[
+      {name:'Social Bearing',url:'https://socialbearing.com',desc:'Análisis de cuentas y tweets: estadísticas, actividad, idioma y horarios de publicación.',tags:['twitter','análisis','estadísticas']},
+      {name:'Cache Digital Digging',url:'https://cache.digitaldigging.org',desc:'Herramienta para acceder a versiones cacheadas de perfiles y tweets de Twitter/X.',tags:['twitter','caché','histórico']},
+    ]},
+    {label:'Discord y Reddit',links:[
+      {name:'Disboard',url:'https://disboard.org/es',desc:'Directorio de servidores públicos de Discord. Busca por categoría, idioma o palabras clave.',tags:['discord','servidores','directorio']},
+      {name:'Discord.id',url:'https://discord.id',desc:'Obtiene información de usuarios y servidores de Discord a partir de su ID numérico.',tags:['discord','lookup','ID']},
+      {name:'Reddit User Analyser',url:'https://reddit-user-analyser.netlify.app',desc:'Analiza el historial de un usuario de Reddit: subreddits, actividad, vocabulario y horarios.',tags:['reddit','análisis','usuario']},
+    ]},
+    {label:'Artículos SOCMINT',links:[
+      {name:'OSINT Social Networks Guide',url:'https://telegra.ph/OSINT-PARA-INV-EN-REDES-SOCIALES-SOCMINT-02-25',desc:'Guía completa de técnicas OSINT aplicadas a la investigación en redes sociales.',tags:['guía','técnicas','socmint']},
+      {name:'SocialBlade',url:'https://socialblade.com',desc:'Estadísticas detalladas de crecimiento y actividad de canales de YouTube, Twitch, Instagram y Twitter.',tags:['estadísticas','youtube','twitch']},
+      {name:'OSINT on Twitch',url:'https://blog.synoslabs.com/osint/2022/12/06/osint-on-twitch.html',desc:'Artículo sobre técnicas de investigación OSINT aplicadas a la plataforma Twitch.',tags:['twitch','guía','osint']},
+      {name:'SnapSave',url:'https://snapsave.app/es1',desc:'Descarga vídeos e historias de Facebook, Instagram y TikTok directamente.',tags:['descarga','facebook','instagram']},
+      {name:'FDown',url:'https://fdown.net',desc:'Descargador de vídeos de Facebook por URL, compatible con vídeos públicos y privados.',tags:['facebook','descarga','vídeo']},
+    ]},
+    {label:'🔍 Dorks',isDorks:true,dorks:[
+      {label:'Perfil Instagram en Google',query:'site:instagram.com "nombre usuario" OR "@usuario"'},
+      {label:'Publicaciones Facebook de persona',query:'site:facebook.com "nombre apellido" "ciudad" OR "trabajo"'},
+      {label:'Vídeos YouTube de persona',query:'site:youtube.com "nombre apellido"'},
+      {label:'Perfil Reddit de usuario',query:'site:reddit.com/user/ "nombreusuario"'},
+      {label:'Canal Telegram relacionado',query:'site:t.me "palabra clave" OR "tema investigación"'},
+      {label:'Perfil TikTok',query:'site:tiktok.com/@"nombreusuario"'},
+      {label:'Servidor Discord por temática',query:'site:disboard.org "tema" "idioma español"'},
+    ]},
+  ]
+},
+{
+  id:'s07',num:'07',title:'Imágenes · IMINT',color:'#fb923c',
+  subs:[
+    {label:'Búsqueda Inversa y Facial',links:[
+      {name:'Google Images',url:'https://images.google.com',desc:'Búsqueda inversa de imágenes de Google. Sube una foto para encontrar dónde aparece en la web.',tags:['imagen inversa','google','web']},
+      {name:'Bing Visual Search',url:'https://www.bing.com/images',desc:'Búsqueda inversa de Microsoft con reconocimiento de objetos, escenas y personas.',tags:['imagen inversa','microsoft','reconocimiento']},
+      {name:'Yandex Images',url:'https://yandex.com/images/',desc:'Búsqueda inversa muy eficaz para imágenes de personas, especialmente en Europa del Este.',tags:['imagen inversa','yandex','europa']},
+      {name:'Baidu Images',url:'https://image.baidu.com/',desc:'Motor de búsqueda inversa de imágenes de Baidu, útil para sujetos de origen asiático.',tags:['imagen inversa','baidu','asia']},
+      {name:'TinEye',url:'https://tineye.com',desc:'Encuentra el origen de una foto y sus versiones modificadas en toda la web.',tags:['imagen inversa','origen','versiones']},
+      {name:'Lenso.ai',url:'https://lenso.ai/',desc:'Búsqueda inversa de imágenes con IA, especializada en encontrar personas y lugares.',tags:['IA','imagen inversa','personas']},
+      {name:'PimEyes',url:'https://pimeyes.com',desc:'Motor de búsqueda facial que encuentra dónde aparece una cara en internet.',tags:['reconocimiento facial','búsqueda','cara']},
+      {name:'FaceCheck.id',url:'https://facecheck.id/es',desc:'Busca una cara en internet usando reconocimiento facial avanzado.',tags:['reconocimiento facial','identidad','búsqueda']},
+      {name:'Search4Faces',url:'https://search4faces.com/search.html',desc:'Búsqueda de rostros en redes sociales rusas y bases de datos públicas.',tags:['reconocimiento facial','redes rusas','VKontakte']},
+      {name:'Picarta.ai',url:'https://picarta.ai',desc:'IA de geolocalización visual: estima el país y ciudad donde fue tomada una foto.',tags:['geolocalización','IA','estimación']},
+      {name:'GeoEstimation TIB',url:'https://labs.tib.eu/geoestimation/',desc:'Herramienta académica de geolocalización de imágenes basada en aprendizaje automático.',tags:['geolocalización','académico','IA']},
+      {name:'Imgops',url:'https://imgops.com',desc:'Lanza una imagen contra múltiples motores de búsqueda inversa simultáneamente.',tags:['imagen inversa','múltiple','simultáneo']},
+      {name:'Profile Image Intel',url:'https://profileimageintel.com',desc:'Analiza imágenes de perfil para detectar si son fotos de stock o generadas por IA.',tags:['foto perfil','IA','stock']},
+      {name:'They See Your Photos',url:'https://theyseeyourphotos.com',desc:'Muestra qué información puede extraerse de tus fotos públicas de redes sociales.',tags:['privacidad','fotos','metadatos']},
+    ]},
+    {label:'Metadatos EXIF',links:[
+      {name:'Metadata2go',url:'https://www.metadata2go.com',desc:'Extrae metadatos de imágenes, documentos y vídeos directamente en el navegador.',tags:['metadatos','EXIF','documentos']},
+      {name:'Pic2Map',url:'https://www.pic2map.com',desc:'Extrae coordenadas GPS de los metadatos EXIF y las muestra en un mapa interactivo.',tags:['GPS','mapa','coordenadas']},
+      {name:'FotoForensics',url:'https://fotoforensics.com',desc:'Análisis forense de imágenes mediante Error Level Analysis (ELA) para detectar manipulaciones.',tags:['forense','ELA','manipulación']},
+      {name:'OnlineEXIFViewer',url:'https://onlineexifviewer.com',desc:'Visualiza todos los metadatos EXIF de una imagen sin necesidad de instalar software.',tags:['EXIF','visualización','online']},
+      {name:'Exif.tools',url:'https://exif.tools',desc:'Extrae y muestra todos los metadatos EXIF de una imagen de forma detallada.',tags:['EXIF','metadatos','detallado']},
+      {name:'ExifInfo',url:'https://exifinfo.org',desc:'Herramienta de análisis de metadatos EXIF con visualización clara y exportación.',tags:['EXIF','análisis','exportación']},
+      {name:'ImgOnline',url:'https://www.imgonline.com.ua',desc:'Suite de herramientas de análisis y manipulación de imágenes online, incluyendo metadatos.',tags:['imágenes','análisis','suite']},
+    ]},
+    {label:'Geolocalización Visual',links:[
+      {name:'GeoSpy AI',url:'https://geospy.ai',desc:'IA que estima la ubicación geográfica de una foto analizando entorno, señales y paisaje.',tags:['geolocalización','IA','estimación']},
+      {name:'Bellingcat GeoLocator',url:'https://geolocator.bellingcat.com',desc:'Herramienta de Bellingcat para geolocalizar imágenes comparando terreno y arquitectura.',tags:['geolocalización','bellingcat','verificación']},
+      {name:'GeoHints',url:'https://geohints.com',desc:'Base de datos visual de pistas geográficas para geolocalización: señales, matrículas, arquitectura.',tags:['geolocalización','pistas','visual']},
+      {name:'GeoGuessr GPT',url:'https://chatgpt.com/g/g-brlHi7t2R-geoguessr-gpt',desc:'GPT especializado en geolocalización de imágenes. Analiza pistas visuales para determinar la ubicación.',tags:['geolocalización','IA','GPT']},
+      {name:'Geolocation Outside Clues',url:'https://github.com/seintpl/osint/blob/main/Geolocation%20Analysis%20Diagram%20Outside%20clues.pdf',desc:'Diagrama de referencia con pistas externas para geolocalización de imágenes.',tags:['geolocalización','diagrama','referencia']},
+      {name:'Finding location from road',url:'https://medium.com/@arseneosint/how-to-find-a-picture-using-the-road-and-your-surroundings-quiztime-write-up-68a7aa2cd3ff',desc:'Artículo sobre cómo geolocalizar una imagen usando las características de la carretera y el entorno.',tags:['geolocalización','técnica','carretera']},
+    ]},
+    {label:'Mejora y Edición Forense',links:[
+      {name:'Cleanup.pictures',url:'https://cleanup.pictures',desc:'Elimina objetos, personas o marcas de agua de imágenes usando IA de relleno inteligente.',tags:['IA','edición','limpieza']},
+      {name:'Picwish',url:'https://picwish.com',desc:'Herramientas de mejora de imagen con IA: eliminación de fondo, mejora de calidad y más.',tags:['IA','mejora','fondo']},
+      {name:'Image Colorizer',url:'https://imagecolorizer.com/enhance',desc:'Coloriza y mejora fotos antiguas o en blanco y negro usando inteligencia artificial.',tags:['colorización','restauración','IA']},
+      {name:'Hotpot.ai Colorize',url:'https://hotpot.ai/colorize-picture',desc:'Coloriza imágenes en blanco y negro con IA de alta calidad.',tags:['colorización','IA','blanco negro']},
+      {name:'Photo Color Correction',url:'https://www.cutout.pro/photo-color-correction',desc:'Corrección automática de color y mejora de calidad en fotografías.',tags:['color','corrección','calidad']},
+      {name:'Clipping Magic',url:'https://clippingmagic.com',desc:'Elimina fondos de imágenes de forma automática con precisión.',tags:['fondo','eliminación','recorte']},
+      {name:'Diffchecker Images',url:'https://www.diffchecker.com/image-compare/',desc:'Compara dos imágenes píxel a píxel para detectar diferencias y manipulaciones.',tags:['comparación','diferencias','forense']},
+      {name:'Postimages',url:'https://postimages.org',desc:'Hosting gratuito de imágenes para compartir capturas durante investigaciones.',tags:['hosting','compartir','imágenes']},
+    ]},
+    {label:'OCR y Matrículas',links:[
+      {name:'JPG2Word',url:'https://jpg2word.com/es/',desc:'Extrae texto de imágenes mediante OCR y lo convierte a formato Word editable.',tags:['OCR','texto','Word']},
+      {name:'i2OCR',url:'https://www.i2ocr.com',desc:'Reconocimiento óptico de caracteres gratuito en múltiples idiomas.',tags:['OCR','multiidioma','texto']},
+      {name:'CopyFromImage',url:'https://www.copyfromimage.com',desc:'Extrae y copia texto de imágenes directamente en el navegador.',tags:['OCR','texto','navegador']},
+      {name:'Plate Recognizer',url:'https://platerecognizer.com',desc:'Reconocimiento automático de matrículas de vehículos en imágenes y vídeos.',tags:['matrículas','reconocimiento','vehículos']},
+      {name:'Carnet.ai',url:'https://carnet.ai',desc:'IA para reconocimiento de matrículas de vehículos a partir de imágenes.',tags:['matrículas','IA','vehículos']},
+      {name:'Vehicle AI',url:'https://vehicle-ai.net',desc:'Identifica marca, modelo y año de vehículos a partir de fotos.',tags:['vehículos','modelo','identificación']},
+    ]},
+    {label:'🔍 Dorks',isDorks:true,dorks:[
+      {label:'Imágenes de una persona',query:'"nombre apellido" filetype:jpg OR filetype:png OR filetype:jpeg'},
+      {label:'Fotos con metadatos GPS en Flickr',query:'site:flickr.com "lugar" "GPS" "coordenadas"'},
+      {label:'Imágenes en documentos públicos',query:'filetype:pdf "fotografía" OR "imagen" site:*.es "nombre"'},
+      {label:'Fotos de evento en Google',query:'"nombre evento" "fecha" filetype:jpg OR filetype:png'},
+    ]},
+  ]
+},
+{
+  id:'s08',num:'08',title:'Mapas · GEOINT',color:'#2dd4bf',
+  subs:[
+    {label:'Mapas y Street View',links:[
+      {name:'Google Maps',url:'https://www.google.com/maps',desc:'Plataforma de mapas de Google con Street View, satélite y navegación en tiempo real.',tags:['mapas','street view','satélite']},
+      {name:'Bing Maps',url:'https://www.bing.com/maps',desc:'Mapas de Microsoft con vista aérea y herramientas de medición.',tags:['mapas','microsoft','aéreo']},
+      {name:'Instant Street View',url:'https://www.instantstreetview.com',desc:'Accede directamente a Street View de Google en cualquier lugar del mundo por coordenadas.',tags:['street view','coordenadas','rápido']},
+      {name:'ShowMyStreet',url:'https://showmystreet.com/',desc:'Visualiza Street View en pantalla completa para cualquier dirección o coordenada.',tags:['street view','pantalla completa','dirección']},
+    ]},
+    {label:'Coordenadas y Conversión',links:[
+      {name:'GPS Coordinates',url:'https://www.gps-coordinates.net/gps-coordinates-converter',desc:'Convierte entre diferentes formatos de coordenadas GPS: decimal, grados-minutos-segundos.',tags:['coordenadas','conversión','GPS']},
+      {name:'CalcMaps',url:'https://www.calcmaps.com',desc:'Calcula distancias, áreas y rutas en un mapa. Útil para análisis de movilidad.',tags:['distancias','áreas','cálculo']},
+      {name:'Quick Geolocation Search',url:'https://cybdetective.com/quickgeolocationsearch.html',desc:'Búsqueda rápida de coordenadas en múltiples servicios de mapas simultáneamente.',tags:['coordenadas','múltiple','rápido']},
+      {name:'Conversor Zonas Horarias',url:'https://www.datosmundial.com/zonas-horarias/conversor.php',desc:'Convierte horas entre zonas horarias de todo el mundo para correlacionar eventos.',tags:['zonas horarias','conversión','global']},
+    ]},
+    {label:'Luz Solar y Sombras',links:[
+      {name:'SunCalc',url:'https://www.suncalc.org',desc:'Calcula la posición del sol, sombras y horas de luz para cualquier lugar y fecha.',tags:['sol','sombras','fecha']},
+      {name:'ShadowMap',url:'https://shadowmap.org/es/',desc:'Visualiza en 3D las sombras que proyectan los edificios en cualquier lugar y momento.',tags:['sombras','3D','edificios']},
+      {name:'Gaisma',url:'https://www.gaisma.com',desc:'Datos de horas de sol, amaneceres, atardeceres y luz disponible por ubicación y fecha.',tags:['sol','amanecer','luz']},
+      {name:'APRS.fi',url:'https://aprs.fi',desc:'Mapa de seguimiento de estaciones de radioaficionados y objetos con posición GPS.',tags:['radio','GPS','tracking']},
+    ]},
+    {label:'Catastro España',links:[
+      {name:'Catastro Inmuebles',url:'https://www1.sedecatastro.gob.es/CYCBienInmueble/OVCBusqueda.aspx',desc:'Búsqueda de bienes inmuebles en el Catastro español: titularidad, superficie y valor catastral.',tags:['catastro','inmuebles','españa']},
+    ]},
+    {label:'🔍 Dorks',isDorks:true,dorks:[
+      {label:'Coordenadas GPS en documentos',query:'"coordenadas" OR "latitud" OR "longitud" filetype:pdf site:*.es'},
+      {label:'Mapas de ubicaciones en redes',query:'"ubicación" OR "location" site:instagram.com "ciudad"'},
+      {label:'Datos catastrales de inmueble',query:'site:catastro.meh.es "referencia catastral"'},
+      {label:'Imágenes satélite de evento',query:'"imagen satélite" OR "foto aérea" "lugar" "fecha" site:*.es'},
+    ]},
+  ]
+},
+{
+  id:'s09',num:'09',title:'Dominios e IPs',color:'#818cf8',
+  subs:[
+    {label:'WHOIS e Histórico',links:[
+      {name:'Investigator',url:'https://abhijithb200.github.io/investigator/',desc:'Herramienta OSINT para investigar dominios: WHOIS, DNS, subdominios y tecnologías.',tags:['dominio','WHOIS','DNS']},
+      {name:'WHOIS WebJustice',url:'https://whois.webjustice.ru/',desc:'Servicio de consulta WHOIS con historial de registros y cambios de titularidad.',tags:['WHOIS','histórico','titularidad']},
+      {name:'OSINT.sh WHOIS History',url:'https://osint.sh/whoishistory/',desc:'Consulta el historial completo de registros WHOIS de un dominio a lo largo del tiempo.',tags:['WHOIS','histórico','dominio']},
+      {name:'Whoxy Reverse WHOIS',url:'https://www.whoxy.com/reverse-whois/',desc:'Busca todos los dominios registrados con un email, nombre o empresa concreto.',tags:['WHOIS','inverso','empresa']},
+      {name:'AnalyzeID',url:'https://analyzeid.com',desc:'Identifica todos los dominios que comparten el mismo Google Analytics ID o AdSense.',tags:['Google Analytics','AdSense','dominios relacionados']},
+      {name:'GoDaddy WHOIS',url:'https://www.godaddy.com/es/whois',desc:'Consulta WHOIS de dominios con datos del titular y fechas de registro.',tags:['WHOIS','godaddy','titular']},
+      {name:'DomainBigData',url:'https://domainbigdata.com',desc:'Relaciona dominios con IPs, emails de registro y otros dominios del mismo titular.',tags:['dominio','IP','relación']},
+      {name:'Wayback Machine',url:'https://archive.org',desc:'Archivo histórico de páginas web. Ve versiones anteriores de cualquier web desde los años 90.',tags:['histórico','archivo','web']},
+      {name:'Archive.fo',url:'https://archive.fo',desc:'Archiva páginas web al instante para preservar evidencias de forma permanente.',tags:['archivo','evidencias','snapshot']},
+      {name:'CachedView',url:'https://cachedview.com',desc:'Accede a versiones en caché de páginas web de Google, Bing y otros motores.',tags:['caché','web','histórico']},
+    ]},
+    {label:'DNS y Subdominios',links:[
+      {name:'DNSDumpster',url:'https://dnsdumpster.com',desc:'Mapea la infraestructura DNS: registros A, MX, NS, TXT y subdominios asociados.',tags:['DNS','subdominios','infraestructura']},
+      {name:'NS.tools',url:'https://ns.tools',desc:'Herramienta completa de análisis DNS: registros, propagación y comparación.',tags:['DNS','registros','propagación']},
+      {name:'DNS History',url:'https://dnshistory.org',desc:'Historial de registros DNS de un dominio: cambios de IP, MX y NS a lo largo del tiempo.',tags:['DNS','histórico','cambios']},
+      {name:'DNSTwist',url:'https://dnstwist.it',desc:'Detecta dominios similares o typosquatting que podrían usarse para phishing.',tags:['typosquatting','phishing','dominios similares']},
+      {name:'Subdomain Finder C99',url:'https://subdomainfinder.c99.nl/',desc:'Enumera subdominios de un dominio objetivo usando múltiples fuentes.',tags:['subdominios','enumeración','reconocimiento']},
+      {name:'Subdomains WhoisXML',url:'https://subdomains.whoisxmlapi.com',desc:'Búsqueda exhaustiva de subdominios usando la API de WhoisXML.',tags:['subdominios','WhoisXML','API']},
+      {name:'crt.sh',url:'https://crt.sh/',desc:'Base de datos de certificados SSL/TLS que revela subdominios y dominios relacionados.',tags:['SSL','certificados','subdominios']},
+      {name:'ViewDNS',url:'https://viewdns.info',desc:'Conjunto de herramientas DNS: IP history, reverse IP, WHOIS, port scanner y más.',tags:['DNS','IP history','reverse']},
+    ]},
+    {label:'Análisis de URLs y Webs',links:[
+      {name:'URLScan.io',url:'https://urlscan.io',desc:'Analiza URLs de forma segura: captura pantalla, tecnologías, IPs y recursos cargados.',tags:['URL','análisis','captura']},
+      {name:'Web-Check',url:'https://web-check.as93.net',desc:'Análisis completo de una web: WHOIS, DNS, SSL, tecnologías, headers y seguridad.',tags:['análisis web','completo','seguridad']},
+      {name:'Wappalyzer',url:'https://www.wappalyzer.com',desc:'Identifica tecnologías usadas en una web: CMS, frameworks, analytics y servidores.',tags:['tecnologías','CMS','frameworks']},
+      {name:'Unfurl',url:'https://dfir.blog/unfurl/',desc:'Descompone y analiza URLs complejas para extraer información oculta en sus parámetros.',tags:['URL','análisis','parámetros']},
+      {name:'URLdna.io',url:'https://urldna.io',desc:'Análisis forense de URLs: captura pantalla, tecnologías, IPs y detección de malware.',tags:['URL','forense','malware']},
+      {name:'Lookyloo',url:'https://lookyloo.circl.lu/',desc:'Captura y analiza el árbol de recursos cargados por una web para identificar rastreadores.',tags:['recursos','rastreadores','captura']},
+      {name:'PhishTank',url:'https://www.phishtank.com',desc:'Base de datos colaborativa de URLs de phishing verificadas por la comunidad.',tags:['phishing','URLs','base de datos']},
+      {name:'Desenmascara.me',url:'https://desenmascara.me',desc:'Detecta si una web española es una tienda fraudulenta o tiene indicios de estafa.',tags:['fraude','tienda','españa']},
+      {name:'Shimon Domain Tool',url:'https://shimon-6983d71a338d.herokuapp.com',desc:'Herramienta de análisis de dominios con consulta de WHOIS, DNS e información del servidor.',tags:['dominio','WHOIS','servidor']},
+      {name:'Website Informer',url:'https://website.informer.com',desc:'Información detallada sobre webs: tráfico, registrante, tecnologías y webs relacionadas.',tags:['web','tráfico','tecnologías']},
+      {name:'SHDN.io',url:'https://shdn.io',desc:'Herramienta de análisis de dominios con información de registro y seguridad.',tags:['dominio','registro','seguridad']},
+      {name:'Guía Wayback Machine',url:'https://gijn.org/resource/4-more-essential-tips-for-using-the-wayback-machine/',desc:'Guía del GIJN con 4 técnicas avanzadas para usar la Wayback Machine en investigaciones.',tags:['wayback','guía','GIJN']},
+      {name:'Guía investigar URLs maliciosas',url:'https://derechodelared.com/2022/11/28/url-maliciosa-actor-detras/',desc:'Artículo sobre cómo investigar una URL maliciosa para identificar al actor detrás.',tags:['URL maliciosa','actor','investigación']},
+    ]},
+    {label:'Análisis de IPs',links:[
+      {name:'IPCost',url:'https://ipcost.com',desc:'Información detallada de IPs: geolocalización, ASN, proveedor y reputación.',tags:['IP','geolocalización','ASN']},
+      {name:'IPData',url:'https://ipdata.co',desc:'API de datos de IPs: geolocalización, VPN, Tor, proxy y detección de abuso.',tags:['IP','VPN','Tor','proxy']},
+      {name:'IPAPI',url:'https://ipapi.com',desc:'Geolocalización y datos de ISP de IPs con alta precisión.',tags:['IP','geolocalización','ISP']},
+      {name:'IPAPI.co',url:'https://ipapi.co',desc:'Datos de IP con información de zona horaria, moneda y idioma del país.',tags:['IP','zona horaria','país']},
+      {name:'Spur.us',url:'https://spur.us/',desc:'Detección avanzada de VPN, proxy, Tor y redes residenciales de IPs.',tags:['VPN','proxy','Tor','residencial']},
+      {name:'AbuseIPDB',url:'https://www.abuseipdb.com',desc:'Base de datos de IPs reportadas por spam, ataques, phishing y botnets.',tags:['abuso','maliciosa','reportes']},
+      {name:'VirusTotal',url:'https://www.virustotal.com',desc:'Analiza URLs, dominios, IPs y archivos con más de 70 motores antivirus.',tags:['malware','análisis','antivirus']},
+      {name:'GreyNoise',url:'https://viz.greynoise.io',desc:'Distingue el tráfico de internet legítimo del malicioso. Contexto de IPs escaneando la red.',tags:['tráfico','malicioso','contexto']},
+      {name:'ThreatYeti',url:'https://threatyeti.com',desc:'Plataforma de inteligencia de amenazas: análisis de IPs, dominios y URLs sospechosas.',tags:['amenazas','inteligencia','análisis']},
+      {name:'IPQualityScore VPN Check',url:'https://www.ipqualityscore.com/vpn-ip-address-check',desc:'Detecta si una IP está usando VPN, proxy, Tor o es una IP de datacenter.',tags:['VPN','proxy','detección']},
+      {name:'IP-API',url:'https://ip-api.com',desc:'API gratuita de geolocalización de IPs con información de ISP y conexión.',tags:['API','geolocalización','gratuito']},
+      {name:'IPAddress.my',url:'https://www.ipaddress.my',desc:'Información básica de geolocalización de cualquier dirección IP.',tags:['IP','geolocalización','básico']},
+      {name:'MaxMind Demo',url:'https://www.maxmind.com/en/geoip-web-services-demo',desc:'Demo del servicio GeoIP de MaxMind, referencia en geolocalización de IPs.',tags:['MaxMind','GeoIP','referencia']},
+      {name:'IP-Tracker',url:'https://www.ip-tracker.org',desc:'Rastreo y geolocalización de IPs con mapa interactivo.',tags:['tracking','mapa','geolocalización']},
+      {name:'Cual es mi IP',url:'https://www.cual-es-mi-ip.net/geolocalizar-ip-mapa',desc:'Geolocaliza cualquier IP en un mapa. Útil para verificar ubicaciones de sospechosos.',tags:['geolocalización','mapa','españa']},
+      {name:'WiGLE',url:'https://wigle.net',desc:'Base de datos de redes WiFi con geolocalización. Útil para rastrear dispositivos por MAC.',tags:['WiFi','MAC','geolocalización']},
+    ]},
+    {label:'Canary Tokens y Captura IP',links:[
+      {name:'Canarytokens',url:'https://canarytokens.org/nest/generate',desc:'Crea tokens trampa (archivos, URLs, emails) que notifican cuando alguien los abre.',tags:['canary','trampa','notificación']},
+      {name:'Grabify',url:'https://grabify.link',desc:'Crea enlaces de rastreo para capturar la IP de quien los abre.',tags:['IP tracking','enlace','captura']},
+      {name:'IPLogger',url:'https://iplogger.org/es/',desc:'Servicio de registro de IPs mediante enlaces cortos o imágenes de seguimiento.',tags:['IP logging','enlace corto','seguimiento']},
+      {name:'InfolByIP',url:'https://www.infobyip.com',desc:'Información detallada de IPs y dominios con análisis de geolocalización.',tags:['IP','dominio','información']},
+    ]},
+    {label:'🔍 Dorks',isDorks:true,dorks:[
+      {label:'Subdominios de un objetivo',query:'site:*.dominio.com -www'},
+      {label:'Archivos de configuración expuestos',query:'site:dominio.com filetype:conf OR filetype:cfg OR filetype:env'},
+      {label:'Panel de administración expuesto',query:'site:dominio.com inurl:"/admin" OR inurl:"/login" OR inurl:"/wp-admin"'},
+      {label:'Dominios registrados por mismo email',query:'site:whoxy.com "email@dominio.com"'},
+      {label:'Certificados SSL de subdominio',query:'site:crt.sh "%.dominio.com"'},
+      {label:'IP en reportes de abuso',query:'site:abuseipdb.com "X.X.X.X"'},
+    ]},
+  ]
+},
+{
+  id:'s10',num:'10',title:'Data Leaks',color:'#ef4444',
+  subs:[
+    {label:'Comprobadores de Filtraciones',links:[
+      {name:'HaveIBeenPwned',url:'https://haveibeenpwned.com',desc:'Referencia global. Comprueba si un email o teléfono aparece en filtraciones de datos conocidas.',tags:['filtraciones','email','referencia']},
+      {name:'Cybernews Leak Check',url:'https://cybernews.com/personal-data-leak-check/',desc:'Comprobador de filtraciones con base de datos actualizada de brechas de seguridad.',tags:['filtraciones','email','cybernews']},
+      {name:'HaveIBeenZuckered',url:'https://haveibeenzuckered.com',desc:'Comprueba si tus datos de Facebook aparecen en la filtración masiva de 533 millones de usuarios.',tags:['facebook','filtración','533 millones']},
+      {name:'Breachdirectory',url:'https://breachdirectory.org',desc:'Busca emails y usuarios en filtraciones con contraseñas parciales hasheadas.',tags:['filtraciones','contraseñas','hash']},
+      {name:'LeakPeek',url:'https://leakpeek.com',desc:'Búsqueda en bases de datos de filtraciones por email, usuario o contraseña.',tags:['filtraciones','búsqueda','base de datos']},
+      {name:'Pentester.com',url:'https://pentester.com',desc:'Herramienta de búsqueda en filtraciones de datos para investigadores de seguridad.',tags:['filtraciones','pentesting','seguridad']},
+      {name:'Ciberprotector Contraseñas',url:'https://ciberprotector.com/comprobador-de-contrase%C3%B1as/',desc:'Comprueba si una contraseña ha aparecido en filtraciones de datos conocidas.',tags:['contraseñas','filtraciones','verificación']},
+    ]},
+    {label:'Bases de Datos Filtradas',links:[
+      {name:'Proxynova COMB',url:'https://www.proxynova.com/tools/comb/',desc:'Busca en la COMB (Compilation of Many Breaches) con más de 3.000 millones de credenciales.',tags:['COMB','credenciales','masivo']},
+      {name:'Hudson Rock',url:'https://www.hudsonrock.com/threat-intelligence-cybercrime-tools',desc:'Herramientas de inteligencia sobre cibercrimen: infostealers, credenciales robadas y actores.',tags:['infostealers','cibercrimen','credenciales']},
+      {name:'IntelX',url:'https://intelx.io',desc:'Motor de búsqueda especializado en datos filtrados, dark web, Tor y archivos históricos.',tags:['darkweb','filtraciones','archivo']},
+    ]},
+    {label:'🔍 Dorks',isDorks:true,dorks:[
+      {label:'Credenciales en Pastebin',query:'site:pastebin.com "email" "password" "contraseña"'},
+      {label:'Filtraciones de empresa en Pastebin',query:'site:pastebin.com "empresa.es" "password" OR "user"'},
+      {label:'Datos personales expuestos en pastes',query:'site:paste.ee OR site:ghostbin.co "DNI" OR "NIF" "contraseña"'},
+      {label:'Archivos con credenciales en GitHub',query:'site:github.com "password" "username" "API_KEY" filename:.env'},
+    ]},
+  ]
+},
+{
+  id:'s11',num:'11',title:'Empresas',color:'#84cc16',
+  subs:[
+    {label:'Registros España y Europa',links:[
+      {name:'InfoNIF',url:'https://infonif.economia3.com',desc:'Consulta de empresas españolas por NIF/CIF: datos de contacto, actividad y estado.',tags:['españa','NIF','CIF']},
+      {name:'DatosCIF',url:'https://www.datoscif.es',desc:'Base de datos de empresas españolas con CIF, actividad CNAE y datos de contacto.',tags:['españa','CIF','CNAE']},
+      {name:'LibreBOR',url:'https://librebor.me/borme/busqueda/',desc:'Búsqueda gratuita en el BORME (Boletín Oficial del Registro Mercantil) español.',tags:['BORME','registro mercantil','españa']},
+      {name:'BORME BOE',url:'https://www.boe.es/diario_borme/',desc:'Boletín Oficial del Registro Mercantil oficial. Nombramientos, ceses y actos societarios.',tags:['BORME','oficial','españa']},
+      {name:'Transparencia.gob.es',url:'https://transparencia.gob.es',desc:'Portal de transparencia español. Contratos públicos, subvenciones y datos de organismos.',tags:['transparencia','contratos','españa']},
+      {name:'NorthData',url:'https://www.northdata.com',desc:'Base de datos de empresas europeas con cuentas anuales, directivos y análisis de negocio.',tags:['europa','directivos','finanzas']},
+      {name:'VAT Search',url:'https://vat-search.co.uk',desc:'Búsqueda de empresas por número de IVA en países de la Unión Europea.',tags:['IVA','UE','europa']},
+    ]},
+    {label:'Directorios Globales',links:[
+      {name:'OpenCorporates',url:'https://opencorporates.com',desc:'Mayor base de datos abierta de empresas del mundo. Cubre más de 200 jurisdicciones.',tags:['global','abierto','200 países']},
+      {name:'Crunchbase',url:'https://www.crunchbase.com',desc:'Startups y empresas tecnológicas con inversiones, fundadores y rondas de financiación.',tags:['startups','inversión','tecnología']},
+      {name:'GLEIF',url:'https://search.gleif.org/#/search/',desc:'Global Legal Entity Identifier. Identificadores únicos de entidades legales a nivel mundial.',tags:['LEI','legal','global']},
+      {name:'BrownBook',url:'https://www.brownbook.net',desc:'Directorio de empresas globales con información de contacto y localización.',tags:['directorio','contacto','global']},
+      {name:'BrandDB WIPO',url:'https://branddb.wipo.int',desc:'Base de datos de marcas registradas de la OMPI a nivel internacional.',tags:['marcas','OMPI','registradas']},
+    ]},
+    {label:'Sanciones y Offshore',links:[
+      {name:'ICIJ Offshore Leaks',url:'https://offshoreleaks.icij.org',desc:'Base de datos del ICIJ con entidades offshore: Panama Papers, Pandora Papers y otros.',tags:['offshore','panama papers','ICIJ']},
+      {name:'OpenSanctions',url:'https://www.opensanctions.org',desc:'Agrega más de 100 listas de sanciones globales, PEPs y personas de alto riesgo.',tags:['sanciones','PEP','global']},
+      {name:'Georgia Business Search',url:'https://ecorp.sos.ga.gov/BusinessSearch',desc:'Búsqueda de empresas registradas en el estado de Georgia (EE.UU.).',tags:['EE.UU.','georgia','registro']},
+      {name:'TMDN TMview',url:'https://www.tmdn.org/tmview/#/tmview/',desc:'Base de datos europea de marcas registradas gestionada por la EUIPO.',tags:['marcas','EUIPO','europa']},
+    ]},
+    {label:'🔍 Dorks',isDorks:true,dorks:[
+      {label:'Empresa en BORME España',query:'site:boe.es "nombre empresa" "nombramiento" OR "cese" OR "disolución"'},
+      {label:'CIF de empresa en documentos',query:'"CIF" OR "NIF" "nombre empresa" filetype:pdf site:*.es'},
+      {label:'Contratos públicos adjudicados',query:'site:contrataciondelestado.es "nombre empresa"'},
+      {label:'Subvenciones recibidas',query:'site:transparencia.gob.es "nombre empresa" "subvención" OR "ayuda"'},
+      {label:'Empresa en Panama Papers',query:'site:offshoreleaks.icij.org "nombre empresa"'},
+      {label:'Directivos en LinkedIn',query:'site:linkedin.com/in/ "empresa" "director" OR "CEO" OR "administrador"'},
+    ]},
+  ]
+},
+{
+  id:'s12',num:'12',title:'Investigación Financiera · FININT',color:'#fbbf24',
+  subs:[
+    {label:'BIN y Tarjetas',links:[
+      {name:'FreeBinChecker',url:'https://www.freebinchecker.com',desc:'Identifica banco emisor, tipo de tarjeta y país a partir de los primeros 6 dígitos (BIN).',tags:['BIN','tarjeta','banco emisor']},
+      {name:'BINlist.net',url:'https://binlist.net',desc:'Base de datos de BINs con información de banco, marca, tipo y país de la tarjeta.',tags:['BIN','banco','país']},
+      {name:'BINdb',url:'https://www.bindb.com/bin-database',desc:'Base de datos BIN con nivel de tarjeta (Gold, Platinum) y datos del banco emisor.',tags:['BIN','nivel','banco']},
+      {name:'BinCodes',url:'https://www.bincodes.com/bin-search/',desc:'Búsqueda de BIN con datos detallados del banco y tipo de tarjeta.',tags:['BIN','búsqueda','detallado']},
+    ]},
+    {label:'IBAN y Cuentas Bancarias',links:[
+      {name:'IBAN.com España',url:'https://es.iban.com',desc:'Valida IBANs y obtiene datos del banco: BIC/SWIFT, nombre de entidad y país.',tags:['IBAN','validación','BIC']},
+      {name:'IBAN Checker',url:'https://es.iban.com/iban-checker',desc:'Verificador de IBANs con desglose de país, banco y número de cuenta.',tags:['IBAN','verificación','desglose']},
+      {name:'Calcula tu IBAN',url:'https://www.calculatuiban.com',desc:'Calcula y verifica IBANs españoles a partir del código de banco y número de cuenta.',tags:['IBAN','cálculo','españa']},
+      {name:'IBAN Calculator',url:'https://es.ibancalculator.com',desc:'Calculadora y validador de IBANs para múltiples países europeos.',tags:['IBAN','calculadora','europa']},
+    ]},
+    {label:'Entidades Financieras España',links:[
+      {name:'BDE Lista MFI España',url:'https://www.bde.es/webbe/es/estadisticas/otras-clasificaciones/clasificacion-entidades/listas-instituciones-financieras/listas-instituciones-financieras-monetarias-pais/lista-mfi-es.html',desc:'Lista oficial del Banco de España de todas las instituciones financieras monetarias registradas.',tags:['BDE','entidades','españa','oficial']},
+      {name:'SEPBLAC',url:'https://www.sepblac.es',desc:'Servicio Ejecutivo de Prevención del Blanqueo de Capitales. Normativa y recursos AML en España.',tags:['AML','blanqueo','españa','oficial']},
+      {name:'OFAC SDN List',url:'https://sanctionssearch.ofac.treas.gov',desc:'Lista de sanciones del Tesoro de EE.UU. Busca personas, empresas y países sancionados.',tags:['OFAC','sanciones','EE.UU.']},
+    ]},
+    {label:'🔍 Dorks',isDorks:true,dorks:[
+      {label:'IBAN en documentos públicos',query:'"ES" "IBAN" OR "cuenta bancaria" filetype:pdf site:*.es'},
+      {label:'Datos bancarios en documentos empresa',query:'"nombre empresa" "CIF" "cuenta corriente" filetype:pdf'},
+      {label:'Contratos con importe público',query:'site:contrataciondelestado.es "nombre" "importe" filetype:pdf'},
+      {label:'Subvenciones BDNS',query:'site:infosubvenciones.es "nombre empresa" "beneficiario"'},
+    ]},
+  ]
+},
+{
+  id:'s13',num:'13',title:'Criptomonedas',color:'#f59e0b',
+  subs:[
+    {label:'Exploradores Blockchain',links:[
+      {name:'Mempool.space',url:'https://mempool.space/es/',desc:'Explorador de la mempool de Bitcoin en tiempo real. Visualiza transacciones pendientes y confirmadas.',tags:['bitcoin','mempool','tiempo real']},
+      {name:'BlockExplorer',url:'https://blockexplorer.com/',desc:'Explorador clásico de la blockchain de Bitcoin con búsqueda de transacciones y bloques.',tags:['bitcoin','explorador','bloques']},
+      {name:'Ethplorer',url:'https://ethplorer.io/es/',desc:'Explora tokens ERC-20 en Ethereum: wallets, transferencias y distribución de tokens.',tags:['ethereum','tokens','ERC-20']},
+      {name:'Blockchain.com Explorer',url:'https://www.blockchain.com/ru/explorer',desc:'Explorador oficial de Blockchain.com para Bitcoin, Ethereum y otras criptomonedas.',tags:['bitcoin','ethereum','oficial']},
+      {name:'Blockchair',url:'https://blockchair.com/',desc:'Explorador multi-blockchain: Bitcoin, Ethereum, Litecoin y más de 20 redes.',tags:['multi-blockchain','búsqueda','análisis']},
+    ]},
+    {label:'Análisis y Trazabilidad',links:[
+      {name:'Crystal Intelligence',url:'https://lite.crystalintelligence.com',desc:'Plataforma de análisis blockchain para investigadores. Traza flujos de fondos y entidades.',tags:['análisis','trazabilidad','entidades']},
+      {name:'Ethtective',url:'https://ethtective.com',desc:'Herramienta visual para investigar transacciones y wallets de Ethereum.',tags:['ethereum','visual','wallets']},
+      {name:'BlockPath',url:'https://blockpath.com',desc:'Análisis de rutas de transacciones Bitcoin con visualización de grafos.',tags:['bitcoin','grafos','rutas']},
+      {name:'Breadcrumbs.app',url:'https://www.breadcrumbs.app',desc:'Trazabilidad visual del flujo de fondos entre wallets. Grafos interactivos.',tags:['grafos','flujo','visual']},
+      {name:'WalletExplorer',url:'https://www.walletexplorer.com',desc:'Agrupa wallets de Bitcoin por entidad conocida: exchanges, servicios y actores.',tags:['bitcoin','entidades','agrupación']},
+      {name:'WalletScan',url:'https://tools.cybertrace.com.au/walletscan',desc:'Herramienta de Cybertrace para análisis de wallets y rastreo de fondos.',tags:['wallet','análisis','cybertrace']},
+      {name:'TokenScope',url:'https://tokenscope.com',desc:'Análisis de tokens y contratos inteligentes para detectar fraudes y actividades sospechosas.',tags:['tokens','contratos','fraude']},
+      {name:'Ethereum Investigation Diagram',url:'https://github.com/OffcierCia/On-Chain-Investigations-Tools-List/blob/main/Ethereum%20Investigation.png',desc:'Diagrama de herramientas y metodología para investigaciones on-chain en Ethereum.',tags:['ethereum','metodología','diagrama']},
+    ]},
+    {label:'ATMs y Recursos',links:[
+      {name:'CoinATMRadar España',url:'https://coinatmradar.com/country/199/bitcoin-atm-spain/',desc:'Mapa de cajeros de Bitcoin y criptomonedas en España con dirección y comisiones.',tags:['ATM','cajero','españa']},
+      {name:'Guía investigación Bitcoin (INTERPOL)',url:'https://advisor-bm.medium.com/bitcoin-transaction-crime-investigation-guide-interpol-3ba633354550',desc:'Guía de investigación de crímenes con Bitcoin orientada a fuerzas policiales de INTERPOL.',tags:['interpol','bitcoin','guía policial']},
+      {name:'Vídeo investigación blockchain',url:'https://youtu.be/_rke7phTpLQ',desc:'Vídeo tutorial sobre técnicas de investigación de transacciones en blockchain.',tags:['youtube','tutorial','blockchain']},
+    ]},
+    {label:'🔍 Dorks',isDorks:true,dorks:[
+      {label:'Wallet Bitcoin en foros',query:'"bc1" OR "1A" "wallet" site:bitcointalk.org'},
+      {label:'Dirección Ethereum en documentos',query:'"0x" "ethereum" OR "ETH" filetype:pdf'},
+      {label:'Wallet en reportes de fraude',query:'site:bitcoinabuse.com "wallet"'},
+      {label:'Criptomonedas en noticias delictivas España',query:'"bitcoin" OR "criptomoneda" "detenido" OR "investigación" site:*.es'},
+    ]},
+  ]
+},
+{
+  id:'s14',num:'14',title:'Sockpuppets',color:'#f43f5e',
+  subs:[
+    {label:'Generadores de Identidad',links:[
+      {name:'Fake Name Generator (ES)',url:'https://es.fakenamegenerator.com/',desc:'Genera identidades falsas completas: nombre, dirección, teléfono, email, DNI y más datos en español.',tags:['identidad falsa','sockpuppet','español']},
+      {name:'Random User',url:'https://randomuser.me',desc:'Genera perfiles de usuario aleatorios con foto, nombre, email y datos de contacto.',tags:['perfil','aleatorio','foto']},
+      {name:'Card Generator',url:'https://cardgenerator.org',desc:'Genera números de tarjeta de crédito ficticios válidos para formularios de prueba.',tags:['tarjeta','ficticio','prueba']},
+      {name:'Dating Profile Generator',url:'https://www.dating-profile-generator.org.uk',desc:'Genera perfiles de citas ficticios para crear leyendas de sockpuppets.',tags:['perfil','citas','leyenda']},
+    ]},
+    {label:'🔍 Dorks',isDorks:true,dorks:[
+      {label:'Detectar foto de perfil de stock',query:'"esta foto" OR "foto de perfil" site:unsplash.com OR site:pexels.com'},
+      {label:'Detectar perfil falso en redes',query:'"joined" "2023" OR "2024" "0 posts" site:twitter.com OR site:instagram.com'},
+    ]},
+  ]
+},
+{
+  id:'s15',num:'15',title:'Visualización y Análisis',color:'#38bdf8',
+  subs:[
+    {label:'Mapas Mentales y Grafos',links:[
+      {name:'OSINT Tracker',url:'https://app.osintracker.com',desc:'Plataforma de gestión de casos OSINT: organiza evidencias, entidades y relaciones.',tags:['casos','evidencias','gestión']},
+      {name:'Draw.io',url:'https://app.diagrams.net/',desc:'Herramienta gratuita para crear diagramas, mapas mentales y grafos de relaciones.',tags:['diagramas','grafos','gratuito']},
+      {name:'Visual Paradigm Online',url:'https://online.visual-paradigm.com/',desc:'Suite de diagramas online: mapas mentales, organigramas y diagramas de relaciones.',tags:['mapas mentales','organigramas','suite']},
+      {name:'Gephi',url:'https://gephi.org',desc:'Software de análisis y visualización de grafos y redes complejas. Referencia en análisis de redes.',tags:['grafos','redes','análisis']},
+      {name:'Datawrapper',url:'https://www.datawrapper.de',desc:'Crea gráficos, tablas y mapas interactivos para visualizar datos de investigación.',tags:['gráficos','mapas','datos']},
+    ]},
+  ]
+},
+{
+  id:'s16',num:'16',title:'Extensiones de Navegador',color:'#a78bfa',
+  isExtensions:true,
+  subs:[
+    {label:'Chrome / Chromium',links:[
+      {name:'Instant Data Scraper',url:'https://chromewebstore.google.com/detail/instant-data-scraper/ofaokhiedipichpaobibbnahnkdoiiah',browser:'chrome',icon:'📊',desc:'Extrae datos de cualquier tabla o lista de una página web a Excel o CSV con un clic.',tags:['scraping','datos','Excel']},
+      {name:'Photosint',url:'https://github.com/Haris87/photosint',browser:'chrome',icon:'📷',desc:'Extensión para análisis OSINT de imágenes: metadatos, búsqueda inversa y más.',tags:['imágenes','metadatos','OSINT']},
+      {name:'SingleFile',url:'https://chrome.google.com/webstore/detail/singlefile/mpiodijhokgodhhofnpbrnapkimhoaoi',browser:'chrome',icon:'📄',desc:'Guarda páginas web completas en un único archivo HTML. Esencial para preservar evidencias.',tags:['evidencias','archivo','HTML']},
+      {name:'Shodan Extension',url:'https://chrome.google.com/webstore/detail/shodan/jjalcfnidlmpjhdfepjhjbinfpaukeaf',browser:'chrome',icon:'🔭',desc:'Muestra información Shodan de la web visitada: puertos, servicios y vulnerabilidades.',tags:['shodan','puertos','servicios']},
+      {name:'Wappalyzer',url:'https://chrome.google.com/webstore/detail/wappalyzer-technology-pro/gppongmhjkpfnbhagpmjfkannfbllamg',browser:'chrome',icon:'⚙️',desc:'Identifica tecnologías de cualquier web: CMS, frameworks, analytics y servidores.',tags:['tecnologías','CMS','frameworks']},
+      {name:'User-Agent Switcher',url:'https://chrome.google.com/webstore/detail/user-agent-switcher-for-c/djflhoibgkdhkhhcedjiklpkjnoahfmg',browser:'chrome',icon:'🎭',desc:'Cambia el User-Agent para simular diferentes dispositivos y evitar fingerprinting.',tags:['user-agent','anonimato','simulación']},
+      {name:'EXIF Viewer Pro',url:'https://chrome.google.com/webstore/detail/exif-viewer-pro/mmbhfeiddhndihdjeganjggkmjapkffm',browser:'chrome',icon:'📸',desc:'Visualiza metadatos EXIF de imágenes directamente en el navegador sin descargarlas.',tags:['EXIF','metadatos','imágenes']},
+    ]},
+    {label:'Firefox',links:[
+      {name:'SingleFile (Firefox)',url:'https://addons.mozilla.org/en-US/firefox/addon/single-file/',browser:'firefox',icon:'📄',desc:'Versión Firefox de SingleFile. Guarda páginas completas como un único archivo HTML.',tags:['evidencias','archivo','HTML']},
+      {name:'Save as PDF',url:'https://addons.mozilla.org/en-US/firefox/addon/save-as-pdf/',browser:'firefox',icon:'📑',desc:'Guarda cualquier página web como PDF directamente desde Firefox.',tags:['PDF','guardar','evidencias']},
+      {name:'Wappalyzer (Firefox)',url:'https://addons.mozilla.org/es/firefox/addon/wappalyzer/',browser:'firefox',icon:'⚙️',desc:'Identifica tecnologías de páginas web en Firefox.',tags:['tecnologías','CMS','análisis']},
+    ]},
+    {label:'Multiplataforma',links:[
+      {name:'uBlock Origin',url:'https://ublockorigin.com',browser:'multi',icon:'🛡️',desc:'Bloqueador de anuncios y rastreadores. Esencial para investigar sin ser perfilado.',tags:['privacidad','rastreadores','bloqueo']},
+      {name:'Privacy Badger',url:'https://privacybadger.org',browser:'multi',icon:'🦡',desc:'Bloquea rastreadores invisibles entre webs. Desarrollado por la EFF.',tags:['privacidad','rastreadores','EFF']},
+    ]},
+  ]
+},
+{
+  id:'s17',num:'17',title:'Formación OSINT',color:'#c084fc',
+  isTraining:true,
+  subs:[
+    {label:'Vídeos YouTube',links:[
+      {name:'OSINT Curious Project',url:'https://www.youtube.com/@OSINTCurious',type:'yt',desc:'Canal de referencia en inglés con casos prácticos, entrevistas y técnicas OSINT.',tags:['inglés','práctico','referencia']},
+      {name:'Sector OSINT (Español)',url:'https://www.youtube.com/@SectorOSINT',type:'yt',desc:'Canal en español con tutoriales de herramientas y casos reales de investigación.',tags:['español','tutoriales','herramientas']},
+      {name:'Bellingcat',url:'https://www.youtube.com/@bellingcat',type:'yt',desc:'Investigaciones reales paso a paso: geolocalización, verificación y SOCMINT.',tags:['inglés','investigaciones','geolocalización']},
+      {name:'Ciberpatrulla',url:'https://ciberpatrulla.com',type:'yt',desc:'Portal español de OSINT creado por investigador de Fuerzas de Seguridad con formación en INTERPOL.',tags:['español','fuerzas seguridad','INTERPOL']},
+      {name:'Vídeo OSINT básico',url:'https://youtu.be/rm-SKJcgOPw',type:'yt',desc:'Vídeo introductorio sobre técnicas y herramientas OSINT básicas para investigadores.',tags:['básico','introducción','youtube']},
+      {name:'Vídeo técnicas OSINT',url:'https://youtu.be/BIh6UqnCFXQ',type:'yt',desc:'Vídeo sobre técnicas avanzadas de investigación OSINT.',tags:['técnicas','avanzado','youtube']},
+      {name:'Vídeo herramientas OSINT',url:'https://youtu.be/0mmsShIqMIk',type:'yt',desc:'Demostración práctica de herramientas OSINT esenciales para investigadores.',tags:['herramientas','práctico','youtube']},
+      {name:'Vídeo live OSINT',url:'https://www.youtube.com/live/I-AdksyviPM',type:'yt',desc:'Sesión en directo de investigación OSINT con demostración de técnicas y herramientas.',tags:['live','directo','youtube']},
+    ]},
+    {label:'Artículos y Guías',links:[
+      {name:'Bellingcat Online Investigation Toolkit',url:'https://docs.google.com/spreadsheets/d/18rtqh8EG2q1xBo2cLNyhIDuK9jrPGwYr9DI2UncoqJQ',type:'doc',desc:'Hoja con más de 500 herramientas OSINT organizadas por categoría. La referencia del sector.',tags:['directorio','500+ herramientas','referencia']},
+      {name:'OSINT Framework',url:'https://osintframework.com',type:'doc',desc:'Árbol interactivo de herramientas OSINT organizadas por tipo de investigación.',tags:['framework','directorio','interactivo']},
+      {name:'Guía búsqueda avanzada LinkedIn',url:'https://nubela.co/blog/how-to-find-anyone-with-an-advanced-linkedin-people-search/',type:'doc',desc:'Guía completa para encontrar a cualquier persona usando la búsqueda avanzada de LinkedIn.',tags:['linkedin','guía','búsqueda']},
+      {name:'Phishing Investigation OSINT',url:'https://osintteam.blog/from-inbox-to-intel-a-deep-dive-into-phishing-investigation-via-osint-d0c7ece36070',type:'doc',desc:'Guía profunda sobre investigación de phishing usando técnicas OSINT.',tags:['phishing','investigación','guía']},
+      {name:'Trace Labs CTF',url:'https://www.tracelabs.org',type:'course',desc:'CTF OSINT para búsqueda de personas desaparecidas. Formación práctica con impacto real.',tags:['CTF','práctica','personas']},
+    ]},
+  ]
+},
+];
+
+// ═══════════════════════════════════════
+// INIT
+// ═══════════════════════════════════════
+let total = 0;
+SECTIONS.forEach(s => {
+  s.subs.forEach(sub => {
+    if (!sub.isDorks && sub.links) total += sub.links.length;
+  });
+});
+document.getElementById('totalCount').textContent = total;
+
+// Build nav
+const secNav = document.getElementById('secNav');
+SECTIONS.forEach(s => {
+  const btn = document.createElement('button');
+  btn.className = 'sec-pill';
+  btn.dataset.sec = s.id;
+  btn.style.color = s.color;
+  btn.textContent = s.title;
+  secNav.appendChild(btn);
+});
+
+// ═══════════════════════════════════════
+// HELPERS
+// ═══════════════════════════════════════
+function fav(url) {
+  try { return `https://www.google.com/s2/favicons?domain=${new URL(url).hostname}&sz=32`; } catch { return ''; }
+}
+
+function makeLinkCard(link, color) {
+  const f = fav(link.url);
+  const card = document.createElement('a');
+  card.className = 'link-card';
+  card.href = link.url;
+  card.target = '_blank';
+  card.rel = 'noopener noreferrer';
+  card.style.setProperty('--hc', color);
+  card.innerHTML = `
+    <img class="link-favicon" src="${f}" alt="" onerror="this.style.visibility='hidden'">
+    <div class="ltext">
+      <span class="lname">${link.name}</span>
+      <span class="ldesc">${link.desc}</span>
+    </div>
+    <div class="card-btns">
+      <span class="info-btn" role="button" tabindex="0" title="Más info">i</span>
+      <span class="card-arrow">↗</span>
+    </div>
+    <div class="tooltip">${link.desc}</div>
+  `;
+  card.querySelector('.info-btn').addEventListener('click', e => {
+    e.preventDefault();
+    e.stopPropagation();
+    openPanel(link, color, f);
+  });
+  return card;
+}
+
+function makeDorkCard(dork, color) {
+  const card = document.createElement('div');
+  card.className = 'dork-card';
+  card.innerHTML = `
+    <div class="dork-label">${dork.label}</div>
+    <div class="dork-code">${dork.query}</div>
+    <div class="dork-actions">
+      <button class="dork-btn dork-copy">📋 Copiar</button>
+      <button class="dork-btn dork-run" style="border-color:${color}44;color:${color}">▶ Ejecutar en Google</button>
+    </div>
+  `;
+  const copyBtn = card.querySelector('.dork-copy');
+  copyBtn.addEventListener('click', () => {
+    navigator.clipboard.writeText(dork.query).then(() => {
+      copyBtn.textContent = '✓ Copiado';
+      copyBtn.classList.add('copied');
+      setTimeout(() => { copyBtn.textContent = '📋 Copiar'; copyBtn.classList.remove('copied'); }, 2000);
+    });
+  });
+  card.querySelector('.dork-run').addEventListener('click', () => {
+    window.open(`https://www.google.com/search?q=${encodeURIComponent(dork.query)}`, '_blank');
+  });
+  return card;
+}
+
+function makeExtCard(link) {
+  const bClass = link.browser==='chrome'?'br-chrome':link.browser==='firefox'?'br-firefox':'br-multi';
+  const bLabel = link.browser==='chrome'?'Chrome':link.browser==='firefox'?'Firefox':'Multi';
+  const card = document.createElement('div');
+  card.style.cssText='background:var(--s1);border:1px solid var(--b1);border-radius:8px;padding:12px 14px;display:flex;gap:12px;align-items:flex-start;';
+  card.innerHTML=`
+    <div style="width:36px;height:36px;border-radius:8px;background:var(--s2);display:flex;align-items:center;justify-content:center;font-size:18px;flex-shrink:0">${link.icon||'🔧'}</div>
+    <div style="flex:1;min-width:0">
+      <div style="font-size:14px;font-weight:700;margin-bottom:4px">${link.name} <span style="font-size:10px;padding:2px 7px;border-radius:3px;margin-left:4px" class="${bClass}">${bLabel}</span></div>
+      <div style="font-size:12px;color:var(--muted);line-height:1.5;margin-bottom:8px">${link.desc}</div>
+      <a href="${link.url}" target="_blank" rel="noopener" style="font-size:11px;color:var(--accent);border:1px solid rgba(0,212,255,.25);border-radius:4px;padding:3px 9px;text-decoration:none;transition:all .15s" onmouseover="this.style.background='rgba(0,212,255,.15)'" onmouseout="this.style.background='none'">↗ Instalar</a>
+    </div>
+  `;
+  return card;
+}
+
+function makeTrainingCard(link) {
+  const tc = link.type==='yt'?'type-yt':link.type==='course'?'type-course':'type-doc';
+  const tl = link.type==='yt'?'▶ YouTube':link.type==='course'?'★ Curso':'📄 Doc';
+  const ic = link.type==='yt'?'▶':link.type==='course'?'★':'📄';
+  const card = document.createElement('a');
+  card.className = 'training-card';
+  card.href = link.url;
+  card.target = '_blank';
+  card.rel = 'noopener noreferrer';
+  card.innerHTML = `
+    <div class="t-thumb">${ic}<span class="t-type ${tc}">${tl}</span></div>
+    <div class="t-info">
+      <div class="t-title">${link.name}</div>
+      <div class="t-desc">${link.desc}</div>
+    </div>
+  `;
+  return card;
+}
+
+// ═══════════════════════════════════════
+// RENDER
+// ═══════════════════════════════════════
+const mainEl = document.getElementById('main');
+
+function renderSection(sec, q) {
+  const block = document.createElement('div');
+  block.className = 'sec-block';
+  block.id = sec.id;
+
+  let cnt = 0;
+  sec.subs.forEach(sub => { if (!sub.isDorks && sub.links) cnt += sub.links.length; });
+
+  block.innerHTML = `
+    <div class="sec-header">
+      <span class="sec-num">${sec.num}</span>
+      <h2 class="sec-title" style="color:${sec.color}">${sec.title}</h2>
+      <span class="sec-count">${cnt} recursos</span>
+    </div>
+  `;
+
+  const tabsWrap = document.createElement('div');
+  tabsWrap.className = 'sub-tabs';
+  const panelsWrap = document.createElement('div');
+
+  sec.subs.forEach((sub, idx) => {
+    // Build tab
+    const tab = document.createElement('button');
+    tab.className = 'sub-tab' + (idx===0?' active':'');
+    tab.style.color = (idx===0||sub.isDorks) ? sec.color : '';
+    tab.textContent = sub.label;
+    tab.dataset.idx = idx;
+    tabsWrap.appendChild(tab);
+
+    // Build panel
+    const panel = document.createElement('div');
+    panel.className = 'sub-panel' + (idx===0?' active':'');
+    panel.dataset.idx = idx;
+
+    if (sub.isDorks) {
+      const grid = document.createElement('div');
+      grid.className = 'dorks-grid';
+      (sub.dorks||[]).forEach(d => grid.appendChild(makeDorkCard(d, sec.color)));
+      panel.appendChild(grid);
+    } else if (sec.isExtensions) {
+      const grid = document.createElement('div');
+      grid.style.cssText = 'display:grid;grid-template-columns:repeat(auto-fill,minmax(290px,1fr));gap:8px';
+      (sub.links||[]).forEach(l => grid.appendChild(makeExtCard(l)));
+      panel.appendChild(grid);
+    } else if (sec.isTraining) {
+      const grid = document.createElement('div');
+      grid.className = 'training-grid';
+      (sub.links||[]).forEach(l => grid.appendChild(makeTrainingCard(l)));
+      panel.appendChild(grid);
+    } else {
+      const links = q ? (sub.links||[]).filter(l =>
+        l.name.toLowerCase().includes(q) ||
+        l.desc.toLowerCase().includes(q) ||
+        (l.tags||[]).some(t => t.toLowerCase().includes(q))
+      ) : (sub.links||[]);
+      if (q && links.length===0) { panel.style.display='none'; }
+      const grid = document.createElement('div');
+      grid.className = 'links-grid';
+      links.forEach(l => grid.appendChild(makeLinkCard(l, sec.color)));
+      panel.appendChild(grid);
+    }
+    panelsWrap.appendChild(panel);
+  });
+
+  // Tab switching
+  tabsWrap.querySelectorAll('.sub-tab').forEach(tab => {
+    tab.addEventListener('click', () => {
+      tabsWrap.querySelectorAll('.sub-tab').forEach(t => { t.classList.remove('active'); t.style.color=''; });
+      panelsWrap.querySelectorAll('.sub-panel').forEach(p => p.classList.remove('active'));
+      tab.classList.add('active');
+      tab.style.color = sec.color;
+      const target = panelsWrap.querySelector(`[data-idx="${tab.dataset.idx}"]`);
+      if (target) target.classList.add('active');
+    });
+  });
+
+  block.appendChild(tabsWrap);
+  block.appendChild(panelsWrap);
+  return block;
+}
+
+function render(q='', filterSec='all') {
+  mainEl.innerHTML = '';
+  const sq = q.toLowerCase().trim();
+
+  SECTIONS.forEach(sec => {
+    if (filterSec!=='all' && sec.id!==filterSec) return;
+    if (sq && !sec.isTraining && !sec.isExtensions) {
+      const has = sec.subs.some(sub => !sub.isDorks && (sub.links||[]).some(l =>
+        l.name.toLowerCase().includes(sq) ||
+        l.desc.toLowerCase().includes(sq) ||
+        (l.tags||[]).some(t => t.toLowerCase().includes(sq))
+      ));
+      if (!has) return;
+    }
+    mainEl.appendChild(renderSection(sec, sq||null));
+  });
+
+  if (mainEl.children.length===0) {
+    mainEl.innerHTML = `<div class="no-results">Sin resultados para "<b>${q}</b>"</div>`;
+  }
+
+  const si = document.getElementById('searchInfo');
+  const fc = document.getElementById('foundCount');
+  if (sq) { si.style.display=''; fc.textContent=mainEl.children.length; }
+  else si.style.display='none';
+}
+
+render();
+
+// ═══════════════════════════════════════
+// NAV
+// ═══════════════════════════════════════
+let activeSec = 'all';
+secNav.addEventListener('click', e => {
+  const pill = e.target.closest('.sec-pill');
+  if (!pill) return;
+  secNav.querySelectorAll('.sec-pill').forEach(p => p.classList.remove('active'));
+  pill.classList.add('active');
+  activeSec = pill.dataset.sec;
+  document.getElementById('searchInput').value = '';
+  document.getElementById('clearBtn').style.display = 'none';
+  document.getElementById('searchInfo').style.display = 'none';
+  render('', activeSec);
+  if (activeSec!=='all') {
+    const el = document.getElementById(activeSec);
+    if (el) setTimeout(() => el.scrollIntoView({behavior:'smooth',block:'start'}), 50);
+  }
+});
+
+// ═══════════════════════════════════════
+// SEARCH
+// ═══════════════════════════════════════
+const searchInput = document.getElementById('searchInput');
+const clearBtn = document.getElementById('clearBtn');
+searchInput.addEventListener('input', () => {
+  const v = searchInput.value;
+  clearBtn.style.display = v ? '' : 'none';
+  secNav.querySelectorAll('.sec-pill').forEach(p => p.classList.remove('active'));
+  secNav.querySelector('[data-sec="all"]').classList.add('active');
+  activeSec = 'all';
+  render(v, 'all');
+});
+clearBtn.addEventListener('click', () => {
+  searchInput.value = '';
+  clearBtn.style.display = 'none';
+  document.getElementById('searchInfo').style.display = 'none';
+  render('', 'all');
+});
+
+// ═══════════════════════════════════════
+// INFO PANEL
+// ═══════════════════════════════════════
+const panel = document.getElementById('infoPanel');
+document.getElementById('panelClose').addEventListener('click', () => panel.classList.remove('open'));
+document.addEventListener('click', e => {
+  if (panel.classList.contains('open') && !panel.contains(e.target) && !e.target.closest('.info-btn')) {
+    panel.classList.remove('open');
+  }
+});
+
+function openPanel(link, color, favicon) {
+  document.getElementById('pFav').src = favicon;
+  document.getElementById('pTitle').textContent = link.name;
+  document.getElementById('pTitle').style.color = color;
+  try { document.getElementById('pDomain').textContent = new URL(link.url).hostname; } catch {}
+  document.getElementById('pDesc').textContent = link.desc;
+  const tagsEl = document.getElementById('pTags');
+  tagsEl.innerHTML = (link.tags||[]).map(t =>
+    `<span class="ptag" style="border-color:${color}44;color:${color}">${t}</span>`
+  ).join('');
+  const go = document.getElementById('pLink');
+  go.href = link.url;
+  go.style.borderColor = color;
+  go.style.color = color;
+  go.style.background = color + '18';
+  panel.classList.add('open');
+}
+
+// Extension browser badge CSS
+const extStyle = document.createElement('style');
+extStyle.textContent = '.br-chrome{background:rgba(251,191,36,.15);color:#f59e0b;border:1px solid rgba(251,191,36,.3);padding:1px 6px;border-radius:3px;} .br-firefox{background:rgba(251,113,133,.15);color:#fb7185;border:1px solid rgba(251,113,133,.3);padding:1px 6px;border-radius:3px;} .br-multi{background:rgba(0,212,255,.1);color:#00d4ff;border:1px solid rgba(0,212,255,.25);padding:1px 6px;border-radius:3px;}';
+document.head.appendChild(extStyle);
+</script>
+</body>
+</html>
