@@ -22,7 +22,7 @@
 [![Ver en vivo](https://img.shields.io/badge/🌐_Ver_en_vivo-s3gad3.github.io-00d4ff?style=for-the-badge&logoColor=white)](https://s3gad3.github.io/Osint-s3gad3/)
 [![Licencia](https://img.shields.io/badge/licencia-MIT-10b981?style=for-the-badge)](LICENSE)
 [![Herramientas](https://img.shields.io/badge/herramientas-120+-f59e0b?style=for-the-badge)](https://s3gad3.github.io/Osint-s3gad3/)
-[![Secciones](https://img.shields.io/badge/secciones-13-a78bfa?style=for-the-badge)](https://s3gad3.github.io/Osint-s3gad3/)
+[![Secciones](https://img.shields.io/badge/secciones-17-a78bfa?style=for-the-badge)](https://s3gad3.github.io/Osint-s3gad3/)
 
 </div>
 
@@ -43,7 +43,7 @@ El objetivo es tener **todas las herramientas en un solo lugar**, organizadas po
 | Función | Descripción |
 |---|---|
 | 🔍 **Buscador en tiempo real** | Filtra por nombre, descripción y categoría |
-| 📂 **13 secciones** | Organizadas con subcategorías navegables |
+| 📂 **17 secciones** | Organizadas con subcategorías navegables |
 | ℹ️ **Panel de información** | Descripción detallada de cada herramienta |
 | 🔎 **Dorks integrados** | Google dorks por categoría con botón de ejecución directa |
 | ⚙️ **Modo admin** | Editor de enlaces integrado con exportación JSON |
@@ -51,24 +51,6 @@ El objetivo es tener **todas las herramientas en un solo lugar**, organizadas po
 | ⚡ **Sin dependencias** | Un único archivo HTML estático, sin backend |
 
 ---
-
-## Secciones
-
-```
-01 · BUSCADORES          Metabuscadores, marcos OSINT y plataformas
-02 · PERSONAS            Búsqueda de personas y superficie de ataque
-03 · TELÉFONOS           Lookup, IMEIs, operadoras y SMS temporales
-04 · CORREOS             Email finder, cabeceras, filtraciones
-05 · NOMBRES DE USUARIO  Búsqueda masiva en +600 plataformas
-06 · REDES SOCIALES      Instagram, Twitter/X, Facebook, TikTok...
-07 · IMÁGENES Y VÍDEOS   Búsqueda inversa, EXIF, forense visual
-08 · DOMINIOS E IPs      WHOIS, DNS, subdominios, certificados SSL
-09 · EMPRESAS            Registros mercantiles, UBO, directorios
-10 · FININT              IBAN/BIC, BIN tarjetas, sanciones, catastro
-11 · CRIPTOMONEDAS       Blockchain explorers, análisis de wallets
-12 · EXTENSIONES         Chrome, Firefox y herramientas multiplataforma
-13 · FORMACIÓN           YouTube, cursos, documentación y guías
-```
 
 Cada sección incluye una pestaña de **🔍 Dorks** con búsquedas avanzadas de Google listas para ejecutar.
 
@@ -203,17 +185,6 @@ O acceder directamente en: **[s3gad3.github.io/Osint-s3gad3](https://s3gad3.gith
 > El uso de estas herramientas debe realizarse siempre dentro del marco legal vigente y respetando la privacidad de las personas. El autor no se responsabiliza del uso indebido de los recursos aquí listados.
 >
 > *"OSINT is not a crime"* — la inteligencia en fuentes abiertas es una disciplina legal cuando se practica de forma ética y dentro de la ley.
-
----
-
-## Recursos de formación recomendados
-
-- 📺 [OSINT Curious Project](https://www.youtube.com/@OSINTCurious) — Canal de referencia en inglés
-- 📺 [Sector OSINT](https://www.youtube.com/@SectorOSINT) — Tutoriales en español
-- 📺 [Bellingcat](https://www.youtube.com/@bellingcat) — Investigaciones reales paso a paso
-- 📄 [Bellingcat Online Investigation Toolkit](https://docs.google.com/spreadsheets/d/18rtqh8EG2q1xBo2cLNyhIDuK9jrPGwYr9DI2UncoqJQ) — +500 herramientas
-- 📄 [OSINT Framework](https://osintframework.com) — Árbol interactivo de recursos
-- 🎓 [Trace Labs CTF](https://www.tracelabs.org) — Práctica con impacto real
 
 ---
 
