@@ -122,7 +122,7 @@ Cada sección incluye una pestaña de **🔍 Dorks** con búsquedas avanzadas de
 </details>
 
 <details>
-<summary><strong>09 · Empresas</strong></summary>
+<summary><strong>11 · Empresas</strong></summary>
 
 | Herramienta | Descripción |
 |---|---|
@@ -135,7 +135,7 @@ Cada sección incluye una pestaña de **🔍 Dorks** con búsquedas avanzadas de
 </details>
 
 <details>
-<summary><strong>10 · FININT</strong></summary>
+<summary><strong>12 · FININT</strong></summary>
 
 | Herramienta | Descripción |
 |---|---|
@@ -148,7 +148,7 @@ Cada sección incluye una pestaña de **🔍 Dorks** con búsquedas avanzadas de
 </details>
 
 <details>
-<summary><strong>11 · Criptomonedas</strong></summary>
+<summary><strong>13 · Criptomonedas</strong></summary>
 
 | Herramienta | Descripción |
 |---|---|
