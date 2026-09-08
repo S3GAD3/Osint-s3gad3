@@ -1,200 +1,266 @@
-<div align="center">
+# 🔎 OSINT · S3GAD3
 
-```
-╔═══════════════════════════════════════════════════════════╗
-║                                                           ║
-║      ██████╗ ███████╗██╗███╗   ██╗████████╗              ║
-║     ██╔═══██╗██╔════╝██║████╗  ██║╚══██╔══╝              ║
-║     ██║   ██║███████╗██║██╔██╗ ██║   ██║                 ║
-║     ██║   ██║╚════██║██║██║╚██╗██║   ██║                 ║
-║     ╚██████╔╝███████║██║██║ ╚████║   ██║                 ║
-║      ╚═════╝ ╚══════╝╚═╝╚═╝  ╚═══╝   ╚═╝                 ║
-║                                                           ║
-║                    · S 3 G A D 3 ·                       ║
-║                                                           ║
-╚═══════════════════════════════════════════════════════════╝
-```
+**Directorio operativo de herramientas OSINT para investigación en fuentes abiertas.**
 
-# OSINT · S3GAD3
-
-**Dashboard de herramientas OSINT para investigación en fuentes abiertas**
-
-[![Ver en vivo](https://img.shields.io/badge/🌐_Ver_en_vivo-s3gad3.github.io-00d4ff?style=for-the-badge&logoColor=white)](https://s3gad3.github.io/Osint-s3gad3/)
-[![Licencia](https://img.shields.io/badge/licencia-MIT-10b981?style=for-the-badge)](LICENSE)
-[![Herramientas](https://img.shields.io/badge/herramientas-300+-f59e0b?style=for-the-badge)](https://s3gad3.github.io/Osint-s3gad3/)
-[![Secciones](https://img.shields.io/badge/secciones-17-a78bfa?style=for-the-badge)](https://s3gad3.github.io/Osint-s3gad3/)
-
-</div>
+🌐 **Acceso a la herramienta:**  
+https://s3gad3.github.io/Osint-s3gad3/
 
 ---
 
-## ¿Qué es esto?
+## 📌 Descripción
 
-Repositorio personal de recursos OSINT (*Open Source Intelligence*) organizado como dashboard web interactivo. Diseñado para investigadores, analistas y profesionales que trabajan con fuentes abiertas en el ámbito de la ciberseguridad, investigación policial y periodismo de datos.
+**OSINT · S3GAD3** es un portal web diseñado para facilitar el acceso a herramientas y fuentes de información abierta utilizadas en investigaciones OSINT (*Open Source Intelligence*).
 
-El objetivo es tener **todas las herramientas en un solo lugar**, organizadas por categoría, con descripciones claras y acceso directo — sin depender de plataformas de pago como start.me.
+El proyecto reúne en una única interfaz recursos para investigar:
 
-> 🔍 **Acceso directo:** [s3gad3.github.io/Osint-s3gad3](https://s3gad3.github.io/Osint-s3gad3/)
+- correos electrónicos y usernames;
+- identidades y presencia digital;
+- números de teléfono e IMEI;
+- dominios, URL, IP e infraestructura;
+- empresas, sociedades y marcas;
+- IBAN, BIN, entidades financieras y pagos;
+- criptomonedas y blockchain;
+- imágenes, vídeo y metadatos;
+- redes sociales y SOCMINT;
+- GEOINT, mapas y transporte;
+- GitHub, código y artefactos técnicos;
+- archivos y documentos;
+- filtraciones y exposición de datos;
+- histórico web;
+- recursos de formación OSINT.
 
----
-
-## Características
-
-| Función | Descripción |
-|---|---|
-| 🔍 **Buscador en tiempo real** | Filtra por nombre, descripción y categoría |
-| 📂 **17 secciones** | Organizadas con subcategorías navegables |
-| ℹ️ **Panel de información** | Descripción detallada de cada herramienta |
-| 🔎 **Dorks integrados** | Google dorks por categoría con botón de ejecución directa |
-| 📱 **Responsive** | Funciona en móvil, tablet y escritorio |
-| ⚡ **Sin dependencias** | Un único archivo HTML estático, sin backend |
-
----
-
-Cada sección incluye una pestaña de **🔍 Dorks** con búsquedas avanzadas de Google listas para ejecutar.
-
----
-
-## Herramientas destacadas
-
-<details>
-<summary><strong>01 · Buscadores</strong></summary>
-
-| Herramienta | Descripción |
-|---|---|
-| [Shodan](https://www.shodan.io) | Motor de búsqueda de dispositivos IoT y servicios expuestos |
-| [IntelX](https://intelx.io) | Datos filtrados, dark web, Tor y archivos históricos |
-| [Perplexity AI](https://www.perplexity.ai) | IA de búsqueda con fuentes citadas en tiempo real |
-| [PublicWWW](https://publicwww.com) | Búsqueda en código fuente de páginas web |
-| [OSINT Framework](https://osintframework.com) | Árbol interactivo de herramientas OSINT |
-
-</details>
-
-<details>
-<summary><strong>03 · Teléfonos</strong></summary>
-
-| Herramienta | Descripción |
-|---|---|
-| [Truecaller](https://www.truecaller.com) | Base de datos global de identificación de llamadas |
-| [PhoneInfoga](https://github.com/sundowndev/phoneinfoga) | OSINT open source para números internacionales |
-| [Defastra](https://defastra.com) | Vincula números con perfiles de redes sociales |
-| [NumLookup](https://www.numlookup.com) | Búsqueda inversa gratuita de números |
-| [Getcontact Bot](https://t.me/getcontact_official_bot) | Cómo tienen guardado un número otros usuarios |
-
-</details>
-
-<details>
-<summary><strong>04 · Correos Electrónicos</strong></summary>
-
-| Herramienta | Descripción |
-|---|---|
-| [Hunter.io](https://hunter.io) | Emails corporativos por dominio |
-| [Epieos](https://epieos.com) | Servicios registrados con un email |
-| [HaveIBeenPwned](https://haveibeenpwned.com) | Filtraciones de datos por email |
-| [Emailrep.io](https://emailrep.io) | Reputación y análisis de direcciones |
-| [MXToolbox](https://mxtoolbox.com) | Análisis técnico de cabeceras y DNS |
-
-</details>
-
-<details>
-<summary><strong>05 · Nombres de Usuario</strong></summary>
-
-| Herramienta | Descripción |
-|---|---|
-| [WhatsMyName](https://whatsmyname.app) | +600 plataformas simultáneas |
-| [Sherlock](https://github.com/sherlock-project/sherlock) | Script Python, +300 redes sociales |
-| [IntelX Username](https://intelx.io/tools?tab=username) | Filtraciones y dark web |
-| [Breachdirectory](https://breachdirectory.org) | Bases de datos comprometidas |
-
-</details>
-
-<details>
-<summary><strong>06 · Redes Sociales · SOCMINT</strong></summary>
-
-| Herramienta | Descripción |
-|---|---|
-| [Osintgram](https://github.com/Datalux/Osintgram) | Análisis OSINT de perfiles Instagram |
-| [Tinfoleak](https://tinfoleak.com) | Metadatos y geolocalización Twitter/X |
-| [Redditmetis](https://redditmetis.com) | Análisis de usuarios Reddit |
-| [WhoPostedWhat](https://whopostedwhat.com) | Búsqueda avanzada en Facebook |
-| [Discord Lookup](https://discordlookup.com) | Info de servidores y usuarios Discord |
-
-</details>
-
-<details>
-<summary><strong>11 · Empresas</strong></summary>
-
-| Herramienta | Descripción |
-|---|---|
-| [BORME](https://www.boe.es/diario_borme/) | Registro Mercantil oficial España |
-| [OpenCorporates](https://opencorporates.com) | +200 jurisdicciones globales |
-| [ICIJ Offshore Leaks](https://offshoreleaks.icij.org) | Panama Papers, Pandora Papers |
-| [OpenSanctions](https://www.opensanctions.org) | Sanciones, PEPs y listas de vigilancia |
-| [Transparencia.gob.es](https://transparencia.gob.es) | Contratos y subvenciones públicas España |
-
-</details>
-
-<details>
-<summary><strong>12 · FININT</strong></summary>
-
-| Herramienta | Descripción |
-|---|---|
-| [IBAN.com](https://www.iban.com) | Validación y análisis de IBANs |
-| [BINlist.net](https://binlist.net) | Banco emisor y tipo de tarjeta por BIN |
-| [OFAC SDN List](https://sanctionssearch.ofac.treas.gov) | Sanciones del Tesoro de EE.UU. |
-| [Catastro.es](https://www.catastro.meh.es) | Bienes inmuebles en España |
-| [SEPBLAC](https://www.sepblac.es) | Prevención blanqueo de capitales España |
-
-</details>
-
-<details>
-<summary><strong>13 · Criptomonedas</strong></summary>
-
-| Herramienta | Descripción |
-|---|---|
-| [Etherscan](https://etherscan.io) | Explorador blockchain Ethereum |
-| [Breadcrumbs.app](https://www.breadcrumbs.app) | Análisis visual de flujo de fondos |
-| [Bitcoinabuse](https://www.bitcoinabuse.com) | Wallets reportadas por fraude |
-| [Chainalysis](https://www.chainalysis.com) | Plataforma profesional policial |
-
-</details>
+El objetivo no es simplemente acumular enlaces, sino disponer de un **punto de partida organizado y operativo para una investigación OSINT**.
 
 ---
 
-## Uso
+## 🚀 Acceso directo
 
-El dashboard es un único archivo HTML estático. No requiere instalación ni servidor.
+La herramienta está publicada mediante GitHub Pages y puede utilizarse directamente desde el navegador:
 
-```bash
-# Clonar el repositorio
-git clone https://github.com/s3gad3/Osint-s3gad3.git
+### 👉 https://s3gad3.github.io/Osint-s3gad3/
 
-# Abrir directamente en el navegador
-open index.html
+No requiere instalación ni servidor propio. La interfaz es responsive y está diseñada para funcionar tanto en **ordenadores como en dispositivos móviles**.
+
+---
+
+## 🧭 Áreas de investigación
+
+Las herramientas se organizan por el tipo de información o fase de investigación:
+
+- 🔎 Buscadores y metaherramientas
+- 👤 Identidad, personas, email y username
+- 🌐 Redes sociales y SOCMINT
+- ☎️ Telefonía e IMEI
+- 🌍 Dominios, URL, IP e infraestructura
+- 🏢 Empresas, marcas y registros
+- 💶 FININT, bancos y pagos
+- ₿ Criptoactivos y blockchain
+- 🖼️ Imágenes, vídeo y verificación
+- 📍 GEOINT, mapas y transporte
+- 💻 Código, GitHub y artefactos técnicos
+- 📄 Archivos, documentos y metadatos
+- ⚠️ Filtraciones y exposición de datos
+- 🕒 Histórico, archivos y preservación
+- 🎓 Formación OSINT
+
+La selección incluye tanto fuentes oficiales como servicios especializados y herramientas de investigación ampliamente utilizadas.
+
+---
+
+## ⚡ Análisis rápido de datos
+
+El portal incorpora un sistema de **detección automática del tipo de dato**.
+
+Puedes introducir, por ejemplo:
+
+```text
+usuario@dominio.es
++34600111222
+8.8.8.8
+ejemplo.com
+https://ejemplo.com/login
+ES9121000418450200051332
 ```
 
-O acceder directamente en: **[s3gad3.github.io/Osint-s3gad3](https://s3gad3.github.io/Osint-s3gad3/)**
+También puede reconocer determinados formatos de hash, BIN y usernames.
+
+Cuando es posible, el sistema identifica automáticamente el tipo de dato y propone herramientas adecuadas para continuar la investigación.
+
+La clasificación inicial se realiza **localmente mediante JavaScript en el navegador**.
 
 ---
 
-## Aviso legal
+## 🕵️ Integración con RASTRO
 
-> Este repositorio es una recopilación de enlaces a herramientas y recursos públicos con fines exclusivamente educativos y de investigación legítima en fuentes abiertas (OSINT).
->
-> El uso de estas herramientas debe realizarse siempre dentro del marco legal vigente y respetando la privacidad de las personas. El autor no se responsabiliza del uso indebido de los recursos aquí listados.
->
-> *"OSINT is not a crime"* — la inteligencia en fuentes abiertas es una disciplina legal cuando se practica de forma ética y dentro de la ley.
+El portal funciona también como punto de acceso al ecosistema:
+
+# RASTRO — Kit de Investigación de Fuentes Abiertas
+
+RASTRO es una colección de herramientas OSINT desarrolladas por **S3GAD3**, orientadas a diferentes tipos de datos y fases de una investigación.
+
+Entre los módulos integrados se encuentran:
+
+- **RASTRO-PHONE** — investigación de números de teléfono.
+- **RASTRO-USER** — usernames y correos electrónicos.
+- **RASTRO-GOOG** — pivotes relacionados con cuentas Google/Gmail.
+- **RASTRO-SOCMINT** — investigación en redes sociales.
+- **RASTRO-WEB** — dominios, URL, IP e infraestructura.
+- **RASTRO-COMPANY** — empresas y sociedades.
+- **RASTRO-FININT** — IBAN, BIN y análisis financiero.
+- **RASTRO-IMAGE** — imágenes, metadatos y verificación.
+- **RASTRO-GH** — GitHub y repositorios públicos.
+- **RASTRO-HEADER** — análisis de cabeceras y artefactos técnicos.
+
+Los módulos RASTRO aparecen tanto en su panel específico como dentro de las categorías correspondientes del directorio.
 
 ---
 
-<div align="center">
+## 🔄 Flujo de trabajo recomendado
 
-**Hecho con** `JetBrains Mono` **·** `HTML` **·** `CSS` **·** `JS vanilla`
-
-Mantenido por **[@S3GAD3](https://github.com/s3gad3)** · A Coruña, España
-
+```text
+DATO INICIAL
+     │
+     ▼
+OSINT · S3GAD3
+     │
+     ▼
+Identificación del tipo de dato
+     │
+     ▼
+Selección de herramientas
+     │
+     ▼
+Obtención de información
+     │
+     ▼
+Nuevos identificadores
+     │
+     ▼
+Pivote a otras fuentes
+     │
+     ▼
+Contraste y documentación
 ```
-[ OSINT · CIBERSEGURIDAD · INVESTIGACIÓN · FUENTES ABIERTAS ]
+
+En OSINT, un resultado debe considerarse normalmente **un nuevo punto de partida y no una conclusión automática**.
+
+---
+
+## 📱 Uso desde móvil
+
+La interfaz está diseñada para adaptarse a pantallas pequeñas y permite utilizar desde el móvil:
+
+- el buscador global;
+- la navegación por categorías;
+- el detector de datos;
+- los módulos RASTRO;
+- las fuentes externas.
+
+Esto permite utilizar el portal como un **panel de acceso rápido OSINT** desde cualquier navegador moderno.
+
+---
+
+## 🔐 Privacidad
+
+El portal es una aplicación web estática.
+
+La identificación inicial de los datos introducidos en el apartado de análisis rápido se realiza en el propio navegador.
+
+El dato solo se comunica a un servicio externo cuando el usuario decide abrir una herramienta o realizar una consulta que dependa de dicho servicio.
+
+Cada herramienta externa dispone de sus propias políticas, condiciones de uso y mecanismos de tratamiento de datos.
+
+---
+
+## ⚠️ Uso responsable
+
+Este proyecto está destinado a:
+
+- investigación legítima en fuentes abiertas;
+- ciberseguridad;
+- análisis de inteligencia;
+- investigación académica;
+- formación;
+- verificación de información.
+
+La presencia de una herramienta en este directorio **no implica que cualquier uso de la misma sea legítimo**.
+
+El usuario es responsable de cumplir la legislación aplicable, las condiciones de uso de cada servicio y las normas relativas a privacidad y protección de datos.
+
+Los resultados obtenidos mediante OSINT deben ser **contrastados antes de extraer conclusiones**.
+
+---
+
+## 🛠️ Tecnología
+
+El proyecto utiliza una arquitectura deliberadamente sencilla:
+
+```text
+HTML
+CSS
+JavaScript
+GitHub Pages
 ```
 
-</div>
+No requiere backend para el funcionamiento básico del portal.
+
+Esto facilita su auditoría, despliegue, mantenimiento, adaptación y creación de forks.
+
+---
+
+## 🤝 Contribuciones
+
+Las mejoras son bienvenidas.
+
+Puedes:
+
+1. hacer un **fork** del repositorio;
+2. crear una rama para tus cambios;
+3. realizar y probar las modificaciones;
+4. enviar un **Pull Request**.
+
+También puedes proponer:
+
+- nuevas herramientas OSINT;
+- eliminación de servicios obsoletos;
+- corrección de enlaces;
+- nuevas categorías;
+- mejoras de interfaz;
+- mejoras de accesibilidad;
+- nuevas funcionalidades.
+
+Se recomienda priorizar herramientas que aporten **valor real al flujo investigador** y evitar añadir enlaces únicamente para aumentar el tamaño del directorio.
+
+---
+
+## 📚 Manual OSINT
+
+El proyecto se complementa con el:
+
+**Manual de Fuentes Abiertas para la Investigación de Cibercrimen**
+
+https://s3gad3.github.io/manual-osint-cibercrimen/
+
+---
+
+## 👨‍💻 Autor
+
+Desarrollado y mantenido por **S3GAD3**.
+
+- GitHub: https://github.com/S3GAD3
+- Portal OSINT: https://s3gad3.github.io/Osint-s3gad3/
+
+---
+
+## 📄 Licencia
+
+Este proyecto se distribuye bajo licencia **MIT**.
+
+Puedes utilizarlo, modificarlo, distribuirlo y crear trabajos derivados conforme a los términos de dicha licencia, manteniendo el aviso de copyright y licencia exigido por MIT.
+
+Consulta el archivo [`LICENSE`](LICENSE) para más información.
+
+---
+
+**OSINT · S3GAD3**  
+*Investigar · Pivotar · Contrastar · Documentar*
