@@ -97,11 +97,8 @@ header.masthead::before{content:'';position:absolute;inset:0;background-image:li
 .rastro-repo{width:36px;flex-shrink:0;display:flex;align-items:center;justify-content:center;border:1px solid var(--border);border-radius:5px;color:var(--navy);text-decoration:none;}
 .rastro-repo:hover{border-color:var(--sc);color:var(--sc);}
 .rastro-repo svg{width:15px;height:15px;fill:currentColor;}
-.manual-card{background:var(--navy);border-top:5px solid var(--sky);}
-.manual-card .rastro-name,.manual-card .rastro-tag{color:#fff;}
-.manual-card .rastro-tag{color:var(--sky);}
-.manual-card .rastro-desc{color:#c3d3e6;}
-.manual-card .rastro-repo{border-color:rgba(255,255,255,.3);color:#fff;}
+.rastro-card.is-ext{background:var(--soft);}
+.rastro-ext-badge{align-self:flex-start;font-size:9.5px;font-weight:800;letter-spacing:.05em;text-transform:uppercase;color:var(--sc);background:var(--panel);border:1px solid var(--border);border-radius:10px;padding:3px 9px;margin-bottom:-2px;}
 
 /* ── STICKY NAV ─────────────────────────────────────── */
 .sticky-bar{position:sticky;top:0;z-index:300;background:var(--navy);display:flex;align-items:center;gap:14px;padding:0 20px;height:50px;box-shadow:0 2px 10px rgba(0,0,0,.18);margin-top:44px;}
@@ -264,7 +261,7 @@ footer a:hover{text-decoration:underline;}
     <div class="masthead-stats">
       <div><b id="statTotal">0</b>recursos catalogados</div>
       <div><b>17</b>categorías</div>
-      <div><b>4</b>herramientas RASTRO propias</div>
+      <div><b id="statRastroCount">0</b>herramientas RASTRO propias</div>
     </div>
   </div>
 </header>
@@ -291,7 +288,7 @@ footer a:hover{text-decoration:underline;}
 
 <section class="rastro-hero">
   <h2>🛡 Kit RASTRO — Herramientas propias</h2>
-  <p class="lead">Suite de herramientas de investigación OSINT desarrolladas por S3GAD3. Funcionan 100% en el navegador, sin backend ni claves de API, con gestión de caso y exportación de informes.</p>
+  <p class="lead">Suite de herramientas de investigación OSINT desarrolladas por S3GAD3: apps web de pivote y extensiones de navegador. Funcionan sin backend ni claves de API, con gestión de caso y exportación de informes.</p>
   <div class="rastro-grid" id="rastroGrid"></div>
 </section>
 
@@ -347,10 +344,31 @@ const RASTRO_TOOLS = [
   {id:'rastro-gh', name:'RASTRO · GH', tag:'GitHub', icon:'🐙', color:'#3949ab',
     desc:'Arqueología de identidad en GitHub: perfil, eventos, commits y forks para localizar direcciones de correo asociadas a una cuenta.',
     url:'https://s3gad3.github.io/rastro-gh/', repo:'https://github.com/S3GAD3/rastro-gh'},
+  {id:'rastro-socmint', name:'RASTRO · SOCMINT', tag:'SOCMINT', icon:'📡', color:'#6b46c1',
+    desc:'Organiza y documenta investigaciones SOCMINT: matriz de descubrimiento multiplataforma, extractor técnico de identificadores, decodificador de IDs temporales, comparador de perfiles, grafo de relaciones e informe exportable.',
+    url:'https://s3gad3.github.io/rastro-socmint/', repo:'https://github.com/S3GAD3/rastro-socmint'},
+  {id:'rastro-header', name:'RASTRO · HEADER', tag:'Cabeceras de Correo', icon:'✉️', color:'#be185d',
+    desc:'Análisis forense de cabeceras de correo: validación SPF/DKIM/DMARC, reconstrucción de la ruta SMTP, detección de anomalías e indicadores de suplantación, y grafo interactivo de infraestructura.',
+    url:'https://s3gad3.github.io/rastro-header/', repo:'https://github.com/S3GAD3/rastro-header'},
+  {id:'rastro-finint', name:'RASTRO · FININT', tag:'Financiero · Cripto', icon:'💶', color:'#b45309',
+    desc:'Análisis financiero: validación de IBAN/CCC y entidad bancaria, identificación de tarjetas (Luhn/BIN), verificación de direcciones Bitcoin/Ethereum y análisis de extractos con grafo de movimientos.',
+    url:'https://s3gad3.github.io/rastro-finint/', repo:'https://github.com/S3GAD3/rastro-finint'},
+  {id:'rastro-company', name:'RASTRO · COMPANY', tag:'Empresas', icon:'🏢', color:'#0f766e',
+    desc:'Investigación OSINT de empresas y personas jurídicas: validación de NIF/CIF, consultas DNS/RDAP, generación automática de dorks y grafo de relaciones entre empresas, personas, marcas, dominios e IPs.',
+    url:'https://s3gad3.github.io/rastro-company/', repo:'https://github.com/S3GAD3/rastro-company'},
+  {id:'rastro-image', name:'RASTRO · IMAGE', tag:'Imágenes · IMINT', icon:'🖼️', color:'#ea580c',
+    desc:'Análisis OSINT de imágenes: hashes de integridad, metadatos EXIF/XMP/IPTC, geolocalización GPS con doble verificación, pivotes de búsqueda inversa, ELA, OCR y detección de códigos QR/barras.',
+    url:'https://s3gad3.github.io/rastro-image/', repo:'https://github.com/S3GAD3/rastro-image'},
+  {id:'rastro-ads', name:'RASTRO · ADS', tag:'Extensión · Monetización y Ads', icon:'💰', color:'#a66b00', isExtension:true,
+    desc:'Extensión de navegador que documenta indicios de monetización, analítica y publicidad en una web: pub-IDs, Google Analytics/GTM, píxeles de Meta/TikTok e identificadores UET. Exporta informe con verificación SHA-256.',
+    repo:'https://github.com/S3GAD3/rastro-ads'},
+  {id:'rastro-paypal', name:'RASTRO · PAYPAL', tag:'Extensión · Perfiles PayPal', icon:'💳', color:'#287a4b', isExtension:true,
+    desc:'Extensión experimental para investigar perfiles públicos de PayPal.Me a partir de username, correo o teléfono. Extrae nombre, ubicación, tipo de cuenta y foto visibles públicamente.',
+    repo:'https://github.com/S3GAD3/rastro-paypal'},
+  {id:'rastro-contact', name:'RASTRO · CONTACT', tag:'Extensión · Datos de Contacto', icon:'📇', color:'#7c3aed', isExtension:true,
+    desc:'Extensión que extrae, normaliza y analiza históricamente datos de contacto de una web: emails, teléfonos y redes sociales, incluidos formatos ofuscados. Correlaciona con snapshots de Wayback Machine.',
+    repo:'https://github.com/S3GAD3/rastro-contact-extension'},
 ];
-const MANUAL = {name:'Manual OSINT · Cibercrimen', tag:'Metodología', icon:'📘',
-  desc:'Manual de metodología OSINT aplicada a la investigación de cibercrimen y policía judicial. No es un listado de herramientas: es método aplicable a casos reales.',
-  url:'https://s3gad3.github.io/manual-osint-cibercrimen/', repo:'https://github.com/S3GAD3/manual-osint-cibercrimen'};
 
 const GH_ICON = '<svg viewBox="0 0 24 24"><path d="M12 .297c-6.63 0-12 5.373-12 12 0 5.303 3.438 9.8 8.205 11.385.6.113.82-.258.82-.577 0-.285-.01-1.04-.015-2.04-3.338.724-4.042-1.61-4.042-1.61C4.422 18.07 3.633 17.7 3.633 17.7c-1.087-.744.084-.729.084-.729 1.205.084 1.838 1.236 1.838 1.236 1.07 1.835 2.809 1.305 3.495.998.108-.776.417-1.305.76-1.605-2.665-.3-5.466-1.332-5.466-5.93 0-1.31.465-2.38 1.235-3.22-.135-.303-.54-1.523.105-3.176 0 0 1.005-.322 3.3 1.23.955-.266 1.98-.399 3-.405 1.02.006 2.045.139 3 .405 2.28-1.552 3.285-1.23 3.285-1.23.645 1.653.24 2.873.12 3.176.765.84 1.23 1.91 1.23 3.22 0 4.61-2.805 5.625-5.475 5.92.42.36.81 1.096.81 2.22 0 1.606-.015 2.896-.015 3.286 0 .315.21.69.825.57C20.565 22.092 24 17.592 24 12.297c0-6.627-5.373-12-12-12"/></svg>';
 
@@ -358,33 +376,25 @@ function renderRastroGrid(){
   const grid = document.getElementById('rastroGrid');
   RASTRO_TOOLS.forEach(t => {
     const card = document.createElement('div');
-    card.className = 'rastro-card';
+    card.className = 'rastro-card' + (t.isExtension ? ' is-ext' : '');
     card.style.setProperty('--sc', t.color);
+    const openBtn = t.isExtension
+      ? `<a class="rastro-open" href="${t.repo}/releases" target="_blank" rel="noopener">Descargar ZIP ↗</a>`
+      : `<a class="rastro-open" href="${t.url}" target="_blank" rel="noopener">Abrir herramienta ↗</a>`;
     card.innerHTML = `
+      ${t.isExtension ? '<span class="rastro-ext-badge">🧩 Extensión · instalación manual</span>' : ''}
       <div class="rastro-icon">${t.icon}</div>
       <div class="rastro-name">${t.name}</div>
       <div class="rastro-tag">${t.tag}</div>
       <div class="rastro-desc">${t.desc}</div>
       <div class="rastro-actions">
-        <a class="rastro-open" href="${t.url}" target="_blank" rel="noopener">Abrir herramienta ↗</a>
+        ${openBtn}
         <a class="rastro-repo" href="${t.repo}" target="_blank" rel="noopener" title="Ver repositorio">${GH_ICON}</a>
       </div>
     `;
     grid.appendChild(card);
   });
-  const mcard = document.createElement('div');
-  mcard.className = 'rastro-card manual-card';
-  mcard.innerHTML = `
-    <div class="rastro-icon">${MANUAL.icon}</div>
-    <div class="rastro-name">${MANUAL.name}</div>
-    <div class="rastro-tag">${MANUAL.tag}</div>
-    <div class="rastro-desc">${MANUAL.desc}</div>
-    <div class="rastro-actions">
-      <a class="rastro-open" href="${MANUAL.url}" target="_blank" rel="noopener" style="background:var(--sky);color:#071a33;">Leer manual ↗</a>
-      <a class="rastro-repo" href="${MANUAL.repo}" target="_blank" rel="noopener" title="Ver repositorio">${GH_ICON}</a>
-    </div>
-  `;
-  grid.appendChild(mcard);
+  document.getElementById('statRastroCount').textContent = RASTRO_TOOLS.length;
 }
 renderRastroGrid();
 
@@ -422,6 +432,7 @@ function buildSuggestions(type, value){
   switch(type){
     case 'email': return [
       ownTool('rastro-user','Pivote completo del correo: redes, filtraciones y gestión de caso.'),
+      ownTool('rastro-header','Si tienes la cabecera completa del correo: valida SPF/DKIM/DMARC y reconstruye la ruta SMTP.'),
       ext('HaveIBeenPwned', `https://haveibeenpwned.com/account/${q}`, 'Comprueba filtraciones de datos conocidas para este correo.', '#a93434'),
       extCopy('Epieos', 'https://epieos.com', 'Servicios Google, redes sociales y calendarios vinculados al correo.', '#0e7490'),
       ext('Hunter.io Verifier', `https://hunter.io/email-verifier/${q}`, 'Verifica si el correo existe y obtén contexto del dominio.', '#287a4b'),
@@ -438,6 +449,7 @@ function buildSuggestions(type, value){
     ];
     case 'username': return [
       ownTool('rastro-user','Pivote de usuario en redes globales y plataformas españolas.'),
+      ownTool('rastro-socmint','Documenta la investigación SOCMINT: matriz de plataformas, comparador de perfiles y grafo de relaciones.'),
       ownTool('rastro-gh','Si es una cuenta de GitHub: localiza correos asociados.'),
       ext('Perfil en GitHub', `https://github.com/${q}`, 'Abre directamente el perfil si existe en GitHub.', '#3949ab'),
       extCopy('WhatsMyName', 'https://whatsmyname.app', 'Busca el usuario en más de 600 plataformas.', '#6b46c1'),
@@ -447,6 +459,7 @@ function buildSuggestions(type, value){
     ];
     case 'domain': return [
       ownTool('rastro-web','WHOIS/RDAP, DNS, certificados y correlación de infraestructura.'),
+      ownTool('rastro-company','Si el dominio es corporativo: valida NIF/CIF y genera el grafo de relaciones de la empresa.'),
       ext('crt.sh', `https://crt.sh/?q=${q}`, 'Certificados SSL/TLS: revela subdominios relacionados.', '#0e7490'),
       ext('WHOIS (who.is)', `https://who.is/whois/${q}`, 'Datos de registro del dominio.', '#125a9c'),
       ext('VirusTotal', `https://www.virustotal.com/gui/domain/${q}`, 'Reputación, DNS histórico y análisis de amenazas.', '#a93434'),
@@ -470,6 +483,7 @@ function buildSuggestions(type, value){
     ];
     default: return [
       ownTool('rastro-user','Pivote general por nombre, alias o dato de texto libre.'),
+      ownTool('rastro-company','Si es un nombre de empresa: valida NIF/CIF y documenta la investigación societaria.'),
       ext('Google (dork)', `https://www.google.com/search?q=${qq}`, 'Busca el dato entrecomillado en toda la web indexada.', '#5d6b78'),
       extCopy('WebMii', 'https://webmii.com', 'Busca información pública asociada a un nombre.', '#125a9c'),
       extCopy('BOE.es', 'https://www.boe.es', 'Busca el dato en el Boletín Oficial del Estado.', '#a66b00'),
@@ -679,6 +693,10 @@ const SECTIONS = [
 {
   id:'s04',num:'04',title:'Correos Electrónicos',color:'#a66b00',
   subs:[
+    {label:'⭐ RASTRO (propia)',links:[
+      {name:'RASTRO · USER',url:'https://s3gad3.github.io/rastro-user/',desc:'Pivote OSINT por email: redes globales, plataformas españolas, gestión de caso y grafo de relaciones.',tags:['rastro','email','pivote']},
+      {name:'RASTRO · HEADER',url:'https://s3gad3.github.io/rastro-header/',desc:'Análisis forense de cabeceras: SPF/DKIM/DMARC, ruta SMTP, anomalías e indicadores de suplantación.',tags:['rastro','cabeceras','forense']},
+    ]},
     {label:'Búsqueda e Identificación',links:[
       {name:'OSINT Industries',url:'https://osint.industries',desc:'A partir de un email obtiene servicios registrados, cuenta Google, redes sociales y más.',tags:['email','google','redes']},
       {name:'Epieos',url:'https://epieos.com',desc:'Busca servicios vinculados a un email: cuentas de Google, calendarios, redes sociales.',tags:['email','google','servicios']},
@@ -741,6 +759,9 @@ const SECTIONS = [
 {
   id:'s06',num:'06',title:'Redes Sociales · SOCMINT',color:'#6b46c1',
   subs:[
+    {label:'⭐ RASTRO (propia)',links:[
+      {name:'RASTRO · SOCMINT',url:'https://s3gad3.github.io/rastro-socmint/',desc:'Matriz de descubrimiento multiplataforma, comparador de perfiles, decodificador de IDs y grafo de relaciones para casos SOCMINT.',tags:['rastro','socmint','caso']},
+    ]},
     {label:'Instagram',links:[
       {name:'TikVib Instagram',url:'https://www.tikvib.com',desc:'Herramienta para ver y analizar perfiles y contenidos de Instagram de forma anónima.',tags:['instagram','anónimo','análisis']},
       {name:'Commentpicker Username',url:'https://commentpicker.com/instagram-username.php',desc:'Obtiene el nombre de usuario de Instagram a partir del User ID numérico.',tags:['instagram','username','ID']},
@@ -810,6 +831,9 @@ const SECTIONS = [
 {
   id:'s07',num:'07',title:'Imágenes · IMINT',color:'#0f766e',
   subs:[
+    {label:'⭐ RASTRO (propia)',links:[
+      {name:'RASTRO · IMAGE',url:'https://s3gad3.github.io/rastro-image/',desc:'Hashes de integridad, metadatos EXIF/XMP/IPTC, geolocalización GPS con doble verificación, ELA, OCR y detección de QR/barras.',tags:['rastro','imagen','exif','ela']},
+    ]},
     {label:'Búsqueda Inversa y Facial',links:[
       {name:'Google Images',url:'https://images.google.com',desc:'Búsqueda inversa de imágenes de Google. Sube una foto para encontrar dónde aparece en la web.',tags:['imagen inversa','google','web']},
       {name:'Bing Visual Search',url:'https://www.bing.com/images',desc:'Búsqueda inversa de Microsoft con reconocimiento de objetos, escenas y personas.',tags:['imagen inversa','microsoft','reconocimiento']},
@@ -1003,6 +1027,9 @@ const SECTIONS = [
 {
   id:'s11',num:'11',title:'Empresas',color:'#287a4b',
   subs:[
+    {label:'⭐ RASTRO (propia)',links:[
+      {name:'RASTRO · COMPANY',url:'https://s3gad3.github.io/rastro-company/',desc:'Validación de NIF/CIF, consultas DNS/RDAP, dorks automáticos y grafo de relaciones entre empresas, personas, marcas, dominios e IPs.',tags:['rastro','empresas','nif','cif']},
+    ]},
     {label:'Registros España y Europa',links:[
       {name:'InfoNIF',url:'https://infonif.economia3.com',desc:'Consulta de empresas españolas por NIF/CIF: datos de contacto, actividad y estado.',tags:['españa','NIF','CIF']},
       {name:'DatosCIF',url:'https://www.datoscif.es',desc:'Base de datos de empresas españolas con CIF, actividad CNAE y datos de contacto.',tags:['españa','CIF','CNAE']},
@@ -1038,6 +1065,9 @@ const SECTIONS = [
 {
   id:'s12',num:'12',title:'Investigación Financiera · FININT',color:'#8a6a1c',
   subs:[
+    {label:'⭐ RASTRO (propia)',links:[
+      {name:'RASTRO · FININT',url:'https://s3gad3.github.io/rastro-finint/',desc:'Validación de IBAN/CCC y entidad bancaria, identificación de tarjetas (Luhn/BIN), verificación de direcciones cripto y análisis de extractos con grafo de movimientos.',tags:['rastro','finint','iban','tarjetas']},
+    ]},
     {label:'BIN y Tarjetas',links:[
       {name:'FreeBinChecker',url:'https://www.freebinchecker.com',desc:'Identifica banco emisor, tipo de tarjeta y país a partir de los primeros 6 dígitos (BIN).',tags:['BIN','tarjeta','banco emisor']},
       {name:'BINlist.net',url:'https://binlist.net',desc:'Base de datos de BINs con información de banco, marca, tipo y país de la tarjeta.',tags:['BIN','banco','país']},
@@ -1066,6 +1096,9 @@ const SECTIONS = [
 {
   id:'s13',num:'13',title:'Criptomonedas',color:'#b7791f',
   subs:[
+    {label:'⭐ RASTRO (propia)',links:[
+      {name:'RASTRO · FININT',url:'https://s3gad3.github.io/rastro-finint/',desc:'Verificación de direcciones Bitcoin (Base58Check, Bech32, Taproot) y Ethereum (EIP-55), con análisis de extractos y grafo de movimientos.',tags:['rastro','cripto','bitcoin','ethereum']},
+    ]},
     {label:'Exploradores Blockchain',links:[
       {name:'Mempool.space',url:'https://mempool.space/es/',desc:'Explorador de la mempool de Bitcoin en tiempo real. Visualiza transacciones pendientes y confirmadas.',tags:['bitcoin','mempool','tiempo real']},
       {name:'BlockExplorer',url:'https://blockexplorer.com/',desc:'Explorador clásico de la blockchain de Bitcoin con búsqueda de transacciones y bloques.',tags:['bitcoin','explorador','bloques']},
@@ -1127,6 +1160,11 @@ const SECTIONS = [
   id:'s16',num:'16',title:'Extensiones de Navegador',color:'#475569',
   isExtensions:true,
   subs:[
+    {label:'⭐ RASTRO (extensiones propias)',links:[
+      {name:'RASTRO · ADS',url:'https://github.com/S3GAD3/rastro-ads/releases',browser:'chrome',icon:'💰',desc:'Documenta indicios de monetización, analítica y publicidad en una web: pub-IDs, GA/GTM, píxeles de Meta/TikTok e identificadores UET.',tags:['rastro','ads','analítica','monetización']},
+      {name:'RASTRO · PAYPAL',url:'https://github.com/S3GAD3/rastro-paypal/releases',browser:'chrome',icon:'💳',desc:'Investiga perfiles públicos de PayPal.Me a partir de username, correo o teléfono. Solo datos mostrados públicamente por PayPal.',tags:['rastro','paypal','financiero']},
+      {name:'RASTRO · CONTACT',url:'https://github.com/S3GAD3/rastro-contact-extension/releases',browser:'chrome',icon:'📇',desc:'Extrae, normaliza y analiza históricamente datos de contacto de una web: emails, teléfonos y redes, incluidos formatos ofuscados.',tags:['rastro','contacto','wayback']},
+    ]},
     {label:'Chrome / Chromium',links:[
       {name:'Instant Data Scraper',url:'https://chromewebstore.google.com/detail/instant-data-scraper/ofaokhiedipichpaobibbnahnkdoiiah',browser:'chrome',icon:'📊',desc:'Extrae datos de cualquier tabla o lista de una página web a Excel o CSV con un clic.',tags:['scraping','datos','Excel']},
       {name:'Photosint',url:'https://github.com/Haris87/photosint',browser:'chrome',icon:'📷',desc:'Extensión para análisis OSINT de imágenes: metadatos, búsqueda inversa y más.',tags:['imágenes','metadatos','OSINT']},
