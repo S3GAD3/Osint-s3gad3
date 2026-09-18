@@ -233,16 +233,6 @@ Se recomienda priorizar herramientas que aporten **valor real al flujo investiga
 
 ---
 
-## 📚 Manual OSINT
-
-El proyecto se complementa con el:
-
-**Manual de Fuentes Abiertas para la Investigación de Cibercrimen**
-
-https://s3gad3.github.io/manual-osint-cibercrimen/
-
----
-
 ## 👨‍💻 Autor
 
 Desarrollado y mantenido por **S3GAD3**.
