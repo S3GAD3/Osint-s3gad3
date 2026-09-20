@@ -9,7 +9,7 @@ https://s3gad3.github.io/rastro-osint/
 
 ## 📌 Descripción
 
-**OSINT · S3GAD3** es un portal web diseñado para facilitar el acceso a herramientas y fuentes de información abierta utilizadas en investigaciones OSINT (*Open Source Intelligence*).
+**RASTRO · OSINT** es un portal web diseñado para facilitar el acceso a herramientas y fuentes de información abierta utilizadas en investigaciones OSINT (*Open Source Intelligence*).
 
 El proyecto reúne en una única interfaz recursos para investigar:
 
