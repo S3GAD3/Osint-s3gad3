@@ -1,4 +1,4 @@
-# 🔎 OSINT · S3GAD3
+# 🔎 RASTRO - OSINT
 
 **Directorio operativo de herramientas OSINT para investigación en fuentes abiertas.**
 
