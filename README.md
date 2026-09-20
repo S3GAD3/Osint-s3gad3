@@ -102,7 +102,6 @@ Entre los módulos integrados se encuentran:
 
 - **RASTRO-PHONE** — investigación de números de teléfono.
 - **RASTRO-USER** — usernames y correos electrónicos.
-- **RASTRO-GOOG** — pivotes relacionados con cuentas Google/Gmail.
 - **RASTRO-SOCMINT** — investigación en redes sociales.
 - **RASTRO-WEB** — dominios, URL, IP e infraestructura.
 - **RASTRO-COMPANY** — empresas y sociedades.
@@ -110,6 +109,14 @@ Entre los módulos integrados se encuentran:
 - **RASTRO-IMAGE** — imágenes, metadatos y verificación.
 - **RASTRO-GH** — GitHub y repositorios públicos.
 - **RASTRO-HEADER** — análisis de cabeceras y artefactos técnicos.
+
+También incorpora cinco extensiones para navegador chromium:
+
+- **RASTRO-ADS** - documenta indicios de monetización, analítica y publicidad de una web.
+- **RASTRO-PAYPAL** - investigación de perfiles públicos de paypal a partir de username, correo o teléfono.
+- **RASTRO-CONTACT** - extracción de datos de contacto de una web. Correlaciona snapshots de wayback machine.
+- **RASTRO-PAYINT** - analiza pasarelas de pago y páginas de checkout en el momento en que se va a realizar un pago online extrayendo información del vendedor.
+- **RASTRO-CAPTURE** - captura, documenta y preserva contenido de redes sociales y webs. Grabación de video por pestaña y descarga de medios.
 
 Los módulos RASTRO aparecen tanto en su panel específico como dentro de las categorías correspondientes del directorio.
 
