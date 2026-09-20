@@ -3,7 +3,7 @@
 **Directorio operativo de herramientas OSINT para investigación en fuentes abiertas.**
 
 🌐 **Acceso a la herramienta:**  
-https://s3gad3.github.io/Osint-s3gad3/
+https://s3gad3.github.io/rastro-osint/
 
 ---
 
@@ -37,7 +37,7 @@ El objetivo no es simplemente acumular enlaces, sino disponer de un **punto de p
 
 La herramienta está publicada mediante GitHub Pages y puede utilizarse directamente desde el navegador:
 
-### 👉 https://s3gad3.github.io/Osint-s3gad3/
+### 👉 https://s3gad3.github.io/rastro-osint/
 
 No requiere instalación ni servidor propio. La interfaz es responsive y está diseñada para funcionar tanto en **ordenadores como en dispositivos móviles**.
 
@@ -245,7 +245,7 @@ Se recomienda priorizar herramientas que aporten **valor real al flujo investiga
 Desarrollado y mantenido por **S3GAD3**.
 
 - GitHub: https://github.com/S3GAD3
-- Portal OSINT: https://s3gad3.github.io/Osint-s3gad3/
+- Portal OSINT: https://s3gad3.github.io/rastro-osint/
 
 ---
 
