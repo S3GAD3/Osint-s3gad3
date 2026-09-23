@@ -388,6 +388,9 @@ const RASTRO_TOOLS = [
   {id:'rastro-ip', name:'RASTRO · IP', tag:'Extensión · Direcciones IP', icon:'🛰️', color:'#0d9488', isExtension:true,
     desc:'Extensión que investiga IPv4/IPv6 en una sola consulta: geolocalización, ISP/organización, resolución DNS inversa, WHOIS/RDAP con ASN y prefijos, contacto de abuso, y detección de VPN/proxy/hosting/CDN con aviso heurístico. Historial local, referencia de caso, pivote a 15+ plataformas OSINT y exportación TXT/HTML/PDF con hash SHA-256.',
     repo:'https://github.com/S3GAD3/rastro-ip-extension'},
+  {id:'rastro-domain', name:'RASTRO · DOMAIN', tag:'Extensión · Nombres de Dominio', icon:'🌐', color:'#4f46e5', isExtension:true,
+    desc:'Extensión que investiga un nombre de dominio en una sola consulta: WHOIS/RDAP del registrador (fechas, estado, entidades), DNS del host (A, AAAA, NS, MX, TXT) y empresa/ISP que aloja el servidor. Reconoce dominios, URLs y correos, distingue host y dominio registrable, y avisa de hosting en nube/CDN/VPN. Historial local, referencia de caso, pivotes OSINT y exportación TXT/HTML/PDF con hash SHA-256.',
+    repo:'https://github.com/S3GAD3/rastro-domain-extension'},
 ];
 
 const GH_ICON = '<svg viewBox="0 0 24 24"><path d="M12 .297c-6.63 0-12 5.373-12 12 0 5.303 3.438 9.8 8.205 11.385.6.113.82-.258.82-.577 0-.285-.01-1.04-.015-2.04-3.338.724-4.042-1.61-4.042-1.61C4.422 18.07 3.633 17.7 3.633 17.7c-1.087-.744.084-.729.084-.729 1.205.084 1.838 1.236 1.838 1.236 1.07 1.835 2.809 1.305 3.495.998.108-.776.417-1.305.76-1.605-2.665-.3-5.466-1.332-5.466-5.93 0-1.31.465-2.38 1.235-3.22-.135-.303-.54-1.523.105-3.176 0 0 1.005-.322 3.3 1.23.955-.266 1.98-.399 3-.405 1.02.006 2.045.139 3 .405 2.28-1.552 3.285-1.23 3.285-1.23.645 1.653.24 2.873.12 3.176.765.84 1.23 1.91 1.23 3.22 0 4.61-2.805 5.625-5.475 5.92.42.36.81 1.096.81 2.22 0 1.606-.015 2.896-.015 3.286 0 .315.21.69.825.57C20.565 22.092 24 17.592 24 12.297c0-6.627-5.373-12-12-12"/></svg>';
@@ -480,6 +483,7 @@ function buildSuggestions(type, value){
       ext('Reddit', `https://www.reddit.com/user/${q}`, 'Abre directamente el perfil si existe en Reddit.', '#a66b00'),
     ];
     case 'domain': return [
+      ownTool('rastro-domain','WHOIS/RDAP del registrador, DNS (A, AAAA, NS, MX, TXT) y empresa/ISP que aloja el servidor en una sola consulta.'),
       ownTool('rastro-web','WHOIS/RDAP, DNS, certificados y correlación de infraestructura.'),
       ownTool('rastro-company','Si el dominio es corporativo: valida NIF/CIF y genera el grafo de relaciones de la empresa.'),
       ext('crt.sh', `https://crt.sh/?q=${q}`, 'Certificados SSL/TLS: revela subdominios relacionados.', '#0e7490'),
@@ -954,6 +958,7 @@ const SECTIONS = [
   id:'s09',num:'09',title:'Dominios e IPs',color:'#1976c5',
   subs:[
     {label:'⭐ RASTRO (propia)',links:[
+      {name:'RASTRO · DOMAIN',url:'https://github.com/S3GAD3/rastro-domain-extension/releases',desc:'Extensión: WHOIS/RDAP del registrador, DNS (A, AAAA, NS, MX, TXT) y empresa/ISP que aloja el servidor de un dominio en una sola consulta.',tags:['rastro','dominio','extensión']},
       {name:'RASTRO · IP',url:'https://github.com/S3GAD3/rastro-ip-extension/releases',desc:'Extensión: geolocalización, ISP, DNS inverso, WHOIS/RDAP, ASN y detección de VPN/proxy/hosting de una IP en una sola consulta.',tags:['rastro','ip','extensión']},
       {name:'RASTRO · WEB',url:'https://s3gad3.github.io/rastro-web/',desc:'WHOIS/RDAP, DNS, Certificate Transparency, Wayback Machine y grafo de relaciones de dominios, IPs y URLs.',tags:['rastro','dominio','ip']},
     ]},
@@ -1195,6 +1200,7 @@ const SECTIONS = [
       {name:'RASTRO · CONTACT',url:'https://github.com/S3GAD3/rastro-contact-extension/releases',browser:'chrome',icon:'📇',desc:'Extrae, normaliza y analiza históricamente datos de contacto de una web: emails, teléfonos y redes, incluidos formatos ofuscados.',tags:['rastro','contacto','wayback']},
       {name:'RASTRO · PAYINT',url:'https://github.com/S3GAD3/rastro-payint-extension/releases',browser:'chrome',icon:'💸',desc:'Analiza pasarelas de pago y checkouts: proveedor, IDs de comerciante, descriptores bancarios e identificadores de transacción. Exporta con verificación SHA-256.',tags:['rastro','pagos','financiero']},
       {name:'RASTRO · CAPTURE',url:'https://github.com/S3GAD3/rastro-capture-extension/releases',browser:'chrome',icon:'📸',desc:'Documenta y preserva contenido de redes sociales y webs: capturas MHTML/JSON, grabación de vídeo y descarga masiva de medios en un paquete verificable.',tags:['rastro','captura','preservación']},
+      {name:'RASTRO · DOMAIN',url:'https://github.com/S3GAD3/rastro-domain-extension/releases',browser:'chrome',icon:'🌐',desc:'Investiga un dominio: WHOIS/RDAP, DNS (A, AAAA, NS, MX, TXT) y empresa/ISP que aloja el servidor. Acepta dominios, URLs y correos. Exporta con hash SHA-256.',tags:['rastro','dominio','whois','dns']},
       {name:'RASTRO · IP',url:'https://github.com/S3GAD3/rastro-ip-extension/releases',browser:'chrome',icon:'🛰️',desc:'Investiga IPv4/IPv6: geolocalización, ISP, DNS inverso, WHOIS/RDAP, ASN, contacto de abuso y detección de VPN/proxy/hosting. Exporta con hash SHA-256.',tags:['rastro','ip','red']},
     ]},
     {label:'Chrome / Chromium',links:[
