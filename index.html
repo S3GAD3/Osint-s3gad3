@@ -385,6 +385,9 @@ const RASTRO_TOOLS = [
   {id:'rastro-capture', name:'RASTRO · CAPTURE', tag:'Extensión · Captura y Preservación', icon:'📸', color:'#0891b2', isExtension:true,
     desc:'Extensión para documentar y preservar contenido de redes sociales (Instagram, TikTok y webs genéricas): publicaciones, perfiles y metadatos, capturas MHTML/JSON, grabación de vídeo por pestaña y descarga masiva de medios. Exporta paquete ZIP con informe, manifiesto y verificación SHA-256, sin servidores ni telemetría.',
     repo:'https://github.com/S3GAD3/rastro-capture-extension'},
+  {id:'rastro-ip', name:'RASTRO · IP', tag:'Extensión · Direcciones IP', icon:'🛰️', color:'#0d9488', isExtension:true,
+    desc:'Extensión que investiga IPv4/IPv6 en una sola consulta: geolocalización, ISP/organización, resolución DNS inversa, WHOIS/RDAP con ASN y prefijos, contacto de abuso, y detección de VPN/proxy/hosting/CDN con aviso heurístico. Historial local, referencia de caso, pivote a 15+ plataformas OSINT y exportación TXT/HTML/PDF con hash SHA-256.',
+    repo:'https://github.com/S3GAD3/rastro-ip-extension'},
 ];
 
 const GH_ICON = '<svg viewBox="0 0 24 24"><path d="M12 .297c-6.63 0-12 5.373-12 12 0 5.303 3.438 9.8 8.205 11.385.6.113.82-.258.82-.577 0-.285-.01-1.04-.015-2.04-3.338.724-4.042-1.61-4.042-1.61C4.422 18.07 3.633 17.7 3.633 17.7c-1.087-.744.084-.729.084-.729 1.205.084 1.838 1.236 1.838 1.236 1.07 1.835 2.809 1.305 3.495.998.108-.776.417-1.305.76-1.605-2.665-.3-5.466-1.332-5.466-5.93 0-1.31.465-2.38 1.235-3.22-.135-.303-.54-1.523.105-3.176 0 0 1.005-.322 3.3 1.23.955-.266 1.98-.399 3-.405 1.02.006 2.045.139 3 .405 2.28-1.552 3.285-1.23 3.285-1.23.645 1.653.24 2.873.12 3.176.765.84 1.23 1.91 1.23 3.22 0 4.61-2.805 5.625-5.475 5.92.42.36.81 1.096.81 2.22 0 1.606-.015 2.896-.015 3.286 0 .315.21.69.825.57C20.565 22.092 24 17.592 24 12.297c0-6.627-5.373-12-12-12"/></svg>';
@@ -437,7 +440,7 @@ function detectType(raw){
 
 function ownTool(id, reason){
   const t = RASTRO_TOOLS.find(x=>x.id===id);
-  return {name:t.name, own:true, icon:t.icon, color:t.color, reason, mode:'copy', url:t.url};
+  return {name:t.name, own:true, icon:t.icon, color:t.color, reason, mode:'copy', url:t.url || (t.repo + '/releases')};
 }
 function ext(name, url, reason, color){ return {name, own:false, reason, mode:'direct', url, color:color||'#125a9c'}; }
 function extCopy(name, url, reason, color){ return {name, own:false, reason, mode:'copy', url, color:color||'#125a9c'}; }
@@ -452,6 +455,7 @@ function buildSuggestions(type, value){
       ownTool('rastro-header','Si tienes la cabecera completa del correo: valida SPF/DKIM/DMARC y reconstruye la ruta SMTP.'),
       ext('HaveIBeenPwned', `https://haveibeenpwned.com/account/${q}`, 'Comprueba filtraciones de datos conocidas para este correo.', '#a93434'),
       extCopy('Epieos', 'https://epieos.com', 'Servicios Google, redes sociales y calendarios vinculados al correo.', '#0e7490'),
+      extCopy('Fingerprint', 'https://fingerprint.to/demo', 'Busca el correo en más de 700 plataformas sin necesidad de registro.', '#6b46c1'),
       ext('Hunter.io Verifier', `https://hunter.io/email-verifier/${q}`, 'Verifica si el correo existe y obtén contexto del dominio.', '#287a4b'),
       ext('Google (dork)', `https://www.google.com/search?q=${qq}`, 'Busca el correo entrecomillado en toda la web indexada.', '#5d6b78'),
       ext('GitHub (commits)', `https://github.com/search?q=${q}&type=commits`, 'Busca el correo en historiales de commits públicos.', '#3949ab'),
@@ -470,6 +474,7 @@ function buildSuggestions(type, value){
       ownTool('rastro-gh','Si es una cuenta de GitHub: localiza correos asociados.'),
       ext('Perfil en GitHub', `https://github.com/${q}`, 'Abre directamente el perfil si existe en GitHub.', '#3949ab'),
       extCopy('WhatsMyName', 'https://whatsmyname.app', 'Busca el usuario en más de 600 plataformas.', '#6b46c1'),
+      extCopy('Fingerprint', 'https://fingerprint.to/demo', 'Busca el usuario en más de 700 plataformas sin necesidad de registro.', '#a66b00'),
       ext('Instagram', `https://www.instagram.com/${q}/`, 'Abre directamente el perfil si existe en Instagram.', '#a93434'),
       ext('X / Twitter', `https://twitter.com/${q}`, 'Abre directamente el perfil si existe en X.', '#125a9c'),
       ext('Reddit', `https://www.reddit.com/user/${q}`, 'Abre directamente el perfil si existe en Reddit.', '#a66b00'),
@@ -484,7 +489,8 @@ function buildSuggestions(type, value){
       ext('Shodan', `https://www.shodan.io/search?query=hostname%3A${q}`, 'Servicios y puertos expuestos asociados al dominio.', '#287a4b'),
     ];
     case 'ip': return [
-      ownTool('rastro-web','Geolocalización, ASN, reputación y correlación de infraestructura.'),
+      ownTool('rastro-ip','Geolocalización, ISP, DNS inverso, WHOIS/RDAP, ASN y detección de VPN/proxy/hosting en una sola consulta.'),
+      ownTool('rastro-web','Correlación de infraestructura, dominios y certificados asociados a la IP.'),
       ext('AbuseIPDB', `https://www.abuseipdb.com/check/${q}`, 'Reportes de abuso asociados a esta IP.', '#a93434'),
       ext('VirusTotal', `https://www.virustotal.com/gui/ip-address/${q}`, 'Reputación y análisis de amenazas de la IP.', '#a93434'),
       ext('Shodan', `https://www.shodan.io/host/${q}`, 'Servicios, puertos y banners expuestos por la IP.', '#287a4b'),
@@ -717,6 +723,7 @@ const SECTIONS = [
     {label:'Búsqueda e Identificación',links:[
       {name:'OSINT Industries',url:'https://osint.industries',desc:'A partir de un email obtiene servicios registrados, cuenta Google, redes sociales y más.',tags:['email','google','redes']},
       {name:'Epieos',url:'https://epieos.com',desc:'Busca servicios vinculados a un email: cuentas de Google, calendarios, redes sociales.',tags:['email','google','servicios']},
+      {name:'Fingerprint',url:'https://fingerprint.to/demo',desc:'Busca un email en más de 700 plataformas de una sola vez, sin necesidad de registro.',tags:['email','multiplataforma','demo']},
       {name:'Universal Free Bot',url:'https://t.me/VPNuniversalYourbot',desc:'Bot de Telegram para lookup de emails: filtraciones, servicios registrados y más.',tags:['telegram','bot','email']},
       {name:'Avatarapi',url:'https://avatarapi.com/',desc:'Obtiene el avatar o foto de perfil asociada a un email en servicios como Gravatar.',tags:['avatar','gravatar','foto']},
       {name:'Digital Footprint Check',url:'https://digitalfootprintcheck.com/free-breach-checker.html',desc:'Comprueba la huella digital de un email: filtraciones, registros y presencia en webs.',tags:['huella digital','filtraciones','email']},
@@ -756,6 +763,7 @@ const SECTIONS = [
       {name:'UserSearch.org',url:'https://usersearch.org',desc:'Busca un nombre de usuario en cientos de redes sociales, foros y plataformas.',tags:['masivo','redes','foros']},
       {name:'IDCrawl Username',url:'https://www.idcrawl.com/username-search',desc:'Busca perfiles de una persona por nombre de usuario en cientos de servicios online.',tags:['perfiles','búsqueda masiva','servicios']},
       {name:'Sherlock',url:'https://github.com/sherlock-project/sherlock',desc:'Script Python que busca un nombre de usuario en más de 300 redes sociales.',tags:['python','open source','300 redes']},
+      {name:'Fingerprint',url:'https://fingerprint.to/demo',desc:'Busca un nombre de usuario en más de 700 plataformas de una sola vez, sin necesidad de registro.',tags:['masivo','700 plataformas','demo']},
     ]},
     {label:'Verificación y Disponibilidad',links:[
       {name:'Instant Username',url:'https://instantusername.com/#/',desc:'Comprobación instantánea de disponibilidad de nombre de usuario en las principales plataformas.',tags:['disponibilidad','instantáneo']},
@@ -945,6 +953,10 @@ const SECTIONS = [
 {
   id:'s09',num:'09',title:'Dominios e IPs',color:'#1976c5',
   subs:[
+    {label:'⭐ RASTRO (propia)',links:[
+      {name:'RASTRO · IP',url:'https://github.com/S3GAD3/rastro-ip-extension/releases',desc:'Extensión: geolocalización, ISP, DNS inverso, WHOIS/RDAP, ASN y detección de VPN/proxy/hosting de una IP en una sola consulta.',tags:['rastro','ip','extensión']},
+      {name:'RASTRO · WEB',url:'https://s3gad3.github.io/rastro-web/',desc:'WHOIS/RDAP, DNS, Certificate Transparency, Wayback Machine y grafo de relaciones de dominios, IPs y URLs.',tags:['rastro','dominio','ip']},
+    ]},
     {label:'WHOIS e Histórico',links:[
       {name:'Investigator',url:'https://abhijithb200.github.io/investigator/',desc:'Herramienta OSINT para investigar dominios: WHOIS, DNS, subdominios y tecnologías.',tags:['dominio','WHOIS','DNS']},
       {name:'WHOIS WebJustice',url:'https://whois.webjustice.ru/',desc:'Servicio de consulta WHOIS con historial de registros y cambios de titularidad.',tags:['WHOIS','histórico','titularidad']},
@@ -1183,6 +1195,7 @@ const SECTIONS = [
       {name:'RASTRO · CONTACT',url:'https://github.com/S3GAD3/rastro-contact-extension/releases',browser:'chrome',icon:'📇',desc:'Extrae, normaliza y analiza históricamente datos de contacto de una web: emails, teléfonos y redes, incluidos formatos ofuscados.',tags:['rastro','contacto','wayback']},
       {name:'RASTRO · PAYINT',url:'https://github.com/S3GAD3/rastro-payint-extension/releases',browser:'chrome',icon:'💸',desc:'Analiza pasarelas de pago y checkouts: proveedor, IDs de comerciante, descriptores bancarios e identificadores de transacción. Exporta con verificación SHA-256.',tags:['rastro','pagos','financiero']},
       {name:'RASTRO · CAPTURE',url:'https://github.com/S3GAD3/rastro-capture-extension/releases',browser:'chrome',icon:'📸',desc:'Documenta y preserva contenido de redes sociales y webs: capturas MHTML/JSON, grabación de vídeo y descarga masiva de medios en un paquete verificable.',tags:['rastro','captura','preservación']},
+      {name:'RASTRO · IP',url:'https://github.com/S3GAD3/rastro-ip-extension/releases',browser:'chrome',icon:'🛰️',desc:'Investiga IPv4/IPv6: geolocalización, ISP, DNS inverso, WHOIS/RDAP, ASN, contacto de abuso y detección de VPN/proxy/hosting. Exporta con hash SHA-256.',tags:['rastro','ip','red']},
     ]},
     {label:'Chrome / Chromium',links:[
       {name:'Instant Data Scraper',url:'https://chromewebstore.google.com/detail/instant-data-scraper/ofaokhiedipichpaobibbnahnkdoiiah',browser:'chrome',icon:'📊',desc:'Extrae datos de cualquier tabla o lista de una página web a Excel o CSV con un clic.',tags:['scraping','datos','Excel']},
