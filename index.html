@@ -164,6 +164,19 @@ main{padding:34px 28px 90px;max-width:1400px;margin:0 auto;}
 .dork-copy.copied{border-color:var(--success);color:var(--success);}
 .dork-run{background:#eaf2fb;color:var(--blue);border-color:#bcd6ef;}
 .dork-run:hover{background:#dbeafd;}
+.dorks-hint{display:flex;align-items:center;justify-content:space-between;gap:12px;flex-wrap:wrap;background:var(--soft);border:1px solid var(--border);border-radius:6px;padding:9px 13px;margin-bottom:10px;font-size:12.8px;color:var(--muted);line-height:1.5;}
+.dorks-clear{background:var(--panel);border:1px solid var(--border);border-radius:5px;padding:5px 12px;font-family:inherit;font-size:12px;font-weight:600;color:var(--muted);cursor:pointer;white-space:nowrap;}
+.dorks-clear:hover{border-color:var(--blue);color:var(--blue);}
+.dork-fields{display:flex;flex-wrap:wrap;gap:8px;}
+.dork-field{display:flex;flex-direction:column;gap:3px;flex:1 1 150px;min-width:0;}
+.dork-flabel{font-size:10.8px;text-transform:uppercase;letter-spacing:.05em;color:var(--muted);font-weight:700;}
+.dork-flabel em{font-style:normal;text-transform:none;letter-spacing:0;font-weight:500;}
+.dork-input{width:100%;box-sizing:border-box;padding:7px 10px;border:1px solid var(--border);border-radius:5px;background:var(--panel);color:var(--text);font-family:inherit;font-size:13.2px;}
+.dork-input:focus{outline:none;border-color:var(--blue);box-shadow:0 0 0 2px rgba(18,90,156,.15);}
+.dk-val{color:var(--blue);font-weight:700;}
+.dk-ph{color:var(--muted);font-style:italic;background:rgba(93,107,120,.12);border-radius:3px;padding:0 3px;}
+.dork-btn:disabled{opacity:.45;cursor:not-allowed;}
+.dork-run:disabled:hover{background:#eaf2fb;}
 
 .training-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(300px,1fr));gap:10px;}
 .training-card{background:var(--panel);border:1px solid var(--border);border-radius:8px;overflow:hidden;text-decoration:none;color:var(--text);transition:all .2s;display:flex;flex-direction:column;}
@@ -460,7 +473,7 @@ function buildSuggestions(type, value){
       extCopy('Epieos', 'https://epieos.com', 'Servicios Google, redes sociales y calendarios vinculados al correo.', '#0e7490'),
       extCopy('Fingerprint', 'https://fingerprint.to/demo', 'Busca el correo en más de 700 plataformas sin necesidad de registro.', '#6b46c1'),
       ext('Hunter.io Verifier', `https://hunter.io/email-verifier/${q}`, 'Verifica si el correo existe y obtén contexto del dominio.', '#287a4b'),
-      ext('Google (dork)', `https://www.google.com/search?q=${qq}`, 'Busca el correo entrecomillado en toda la web indexada.', '#5d6b78'),
+      ext('Google (dork)', `https://www.google.com/search?q=${enc(DK_MODS.email(dkClean(v)))}`, 'Busca el correo y sus formas ofuscadas ([at], (at), arroba) en toda la web indexada.', '#5d6b78'),
       ext('GitHub (commits)', `https://github.com/search?q=${q}&type=commits`, 'Busca el correo en historiales de commits públicos.', '#3949ab'),
     ];
     case 'phone': return [
@@ -468,13 +481,14 @@ function buildSuggestions(type, value){
       ext('HaveIBeenPwned', `https://haveibeenpwned.com/account/${q}`, 'Comprueba si el número aparece en filtraciones conocidas.', '#a93434'),
       extCopy('WhatsApp Check Leaked', 'https://whatsapp.checkleaked.cc', 'Verifica si el número está vinculado a filtraciones de WhatsApp.', '#287a4b'),
       extCopy('OSINT Industries', 'https://osint.industries', 'Correlaciona el número con decenas de servicios registrados.', '#125a9c'),
-      ext('Google (dork)', `https://www.google.com/search?q=${qq}`, 'Busca el número entrecomillado en foros, redes y documentos.', '#5d6b78'),
+      ext('Google (dork)', `https://www.google.com/search?q=${enc(DK_MODS.phone(dkClean(v)))}`, 'Busca el número en todos sus formatos habituales (con espacios, guiones, prefijo +34…).', '#5d6b78'),
       extCopy('CNMC Portabilidad', 'https://numeracionyoperadores.cnmc.es/portabilidad/movil', 'Identifica la operadora actual del número (España).', '#a66b00'),
     ];
     case 'username': return [
       ownTool('rastro-user','Pivote de usuario en redes globales y plataformas españolas.'),
       ownTool('rastro-socmint','Documenta la investigación SOCMINT: matriz de plataformas, comparador de perfiles y grafo de relaciones.'),
       ownTool('rastro-gh','Si es una cuenta de GitHub: localiza correos asociados.'),
+      ext('Google (dork)', `https://www.google.com/search?q=${enc(DK_MODS.user(v)+' (site:x.com OR site:instagram.com OR site:facebook.com OR site:tiktok.com OR site:reddit.com OR site:github.com OR site:t.me)')}`, 'Busca el alias en las redes principales indexadas.', '#5d6b78'),
       ext('Perfil en GitHub', `https://github.com/${q}`, 'Abre directamente el perfil si existe en GitHub.', '#3949ab'),
       extCopy('WhatsMyName', 'https://whatsmyname.app', 'Busca el usuario en más de 600 plataformas.', '#6b46c1'),
       extCopy('Fingerprint', 'https://fingerprint.to/demo', 'Busca el usuario en más de 700 plataformas sin necesidad de registro.', '#a66b00'),
@@ -486,6 +500,7 @@ function buildSuggestions(type, value){
       ownTool('rastro-domain','WHOIS/RDAP del registrador, DNS (A, AAAA, NS, MX, TXT) y empresa/ISP que aloja el servidor en una sola consulta.'),
       ownTool('rastro-web','WHOIS/RDAP, DNS, certificados y correlación de infraestructura.'),
       ownTool('rastro-company','Si el dominio es corporativo: valida NIF/CIF y genera el grafo de relaciones de la empresa.'),
+      ext('Google (dork)', `https://www.google.com/search?q=${enc('site:*.'+DK_MODS.domain(v)+' -site:www.'+DK_MODS.domain(v))}`, 'Subdominios del objetivo indexados en Google.', '#5d6b78'),
       ext('crt.sh', `https://crt.sh/?q=${q}`, 'Certificados SSL/TLS: revela subdominios relacionados.', '#0e7490'),
       ext('WHOIS (who.is)', `https://who.is/whois/${q}`, 'Datos de registro del dominio.', '#125a9c'),
       ext('VirusTotal', `https://www.virustotal.com/gui/domain/${q}`, 'Reputación, DNS histórico y análisis de amenazas.', '#a93434'),
@@ -626,13 +641,18 @@ const SECTIONS = [
       {name:'PublicWWW',url:'https://publicwww.com',desc:'Motor que busca en el código fuente de páginas web. Encuentra webs con un script o fragmento concreto.',tags:['código fuente','web','análisis']},
     ]},
     {label:'🔍 Dorks',isDorks:true,dorks:[
-      {label:'Archivos PDF con datos personales expuestos',query:'filetype:pdf "confidencial" OR "datos personales" site:*.es'},
-      {label:'Hojas Excel con datos filtrados',query:'filetype:xlsx "DNI" OR "NIF" OR "contraseña" OR "password"'},
-      {label:'Directorios web abiertos',query:'intitle:"index of" "parent directory" -site:github.com'},
-      {label:'Archivos de configuración expuestos',query:'filetype:env OR filetype:cfg "password" OR "API_KEY"'},
-      {label:'Documentos de licitaciones públicas España',query:'site:contrataciondelestado.es filetype:pdf'},
-      {label:'Cámaras IP expuestas en internet',query:'intitle:"webcamXP" OR intitle:"IP Camera" inurl:"/view.shtml"'},
-      {label:'Bases de datos expuestas',query:'intitle:"phpMyAdmin" inurl:"/phpmyadmin/" "Welcome to phpMyAdmin"'},
+      {label:'Documentos por término (PDF, Word, Excel, PowerPoint)',q:'{tema|or} (filetype:pdf OR filetype:docx OR filetype:xlsx OR filetype:pptx)[ site:{dominio|domain}]'},
+      {label:'Documentos confidenciales o de uso interno',q:'("confidencial" OR "uso interno" OR "no distribuir" OR "datos personales") (filetype:pdf OR filetype:docx OR filetype:xlsx OR filetype:pptx)[ {tema|or}][ site:{dominio|domain}]'},
+      {label:'Hojas de cálculo con datos personales',q:'(filetype:xlsx OR filetype:xls OR filetype:csv) ("DNI" OR "NIF" OR "email" OR "teléfono" OR "contraseña")[ {tema|or}][ site:{dominio|domain}]'},
+      {label:'Directorios abiertos (index of)',q:'intitle:"index of" ("parent directory" OR "last modified")[ {tema|or}][ site:{dominio|domain}] -inurl:(jsp|pl|php|html|aspx|htm|cf|shtml)'},
+      {label:'Ficheros de configuración y secretos expuestos',q:'(ext:env OR ext:cfg OR ext:conf OR ext:ini OR ext:yml OR ext:json OR ext:xml OR ext:log) ("DB_PASSWORD" OR "API_KEY" OR "passwd" OR "secret" OR "token")[ {tema|or}][ site:{dominio|domain}]'},
+      {label:'Copias de seguridad y volcados de base de datos',q:'(ext:sql OR ext:bak OR ext:old OR ext:zip OR ext:7z OR ext:tar OR ext:gz) ("backup" OR "dump" OR "INSERT INTO")[ {tema|or}][ site:{dominio|domain}]'},
+      {label:'Paneles de login y administración',q:'(inurl:admin OR inurl:login OR inurl:wp-admin OR inurl:administrator OR intitle:"panel de control")[ {tema|or}][ site:{dominio|domain}]'},
+      {label:'phpMyAdmin expuesto (opcional: limitar a un dominio)',q:'intitle:"phpMyAdmin" "Welcome to phpMyAdmin" inurl:"/phpmyadmin/"[ site:{dominio|domain}]'},
+      {label:'Cámaras IP y visores web expuestos',q:'(intitle:"Live View / - AXIS" OR intitle:"webcamXP 5" OR inurl:"/view/index.shtml" OR inurl:"ViewerFrame?Mode=" OR intitle:"IP Camera" inurl:"/view.shtml")'},
+      {label:'Documentos compartidos públicamente (Drive, Docs, Dropbox…)',q:'(site:docs.google.com OR site:drive.google.com OR site:onedrive.live.com OR site:dropbox.com OR site:mega.nz) {tema|or}'},
+      {label:'Almacenamiento en la nube abierto (S3, Azure, GCS)',q:'(site:s3.amazonaws.com OR site:blob.core.windows.net OR site:storage.googleapis.com OR site:digitaloceanspaces.com) {tema|or}'},
+      {label:'Licitaciones públicas por término (Plataforma de Contratación)',q:'site:contrataciondelestado.es filetype:pdf[ {tema|or}]'},
     ]},
   ]
 },
@@ -660,12 +680,17 @@ const SECTIONS = [
       {name:'Social Searcher',url:'https://www.social-searcher.com/unofficial-search/',desc:'Monitoriza y busca menciones en redes sociales en tiempo real sin necesidad de cuenta.',tags:['redes sociales','monitorización','menciones']},
     ]},
     {label:'🔍 Dorks',isDorks:true,dorks:[
-      {label:'Persona en documentos oficiales España',query:'site:boe.es "NOMBRE APELLIDO"'},
-      {label:'Perfil LinkedIn de persona',query:'site:linkedin.com/in/ "nombre apellido" "España"'},
-      {label:'CV o currículum expuesto',query:'"curriculum vitae" OR "currículum" filetype:pdf "nombre" "teléfono"'},
-      {label:'Email corporativo de persona',query:'"nombre.apellido@" site:*.es filetype:pdf OR filetype:doc'},
-      {label:'Persona en contratos públicos',query:'site:contrataciondelestado.es "nombre apellido"'},
-      {label:'Persona en noticias de prensa',query:'"nombre apellido" site:elpais.com OR site:elmundo.es OR site:abc.es'},
+      {label:'Persona en boletines oficiales (BOE/BORME)',q:'site:boe.es {nombre|name}'},
+      {label:'Perfil de LinkedIn',q:'site:linkedin.com/in/ {nombre|name}[ {ciudad}]'},
+      {label:'Perfiles en redes sociales principales',q:'{nombre|name} (site:x.com OR site:twitter.com OR site:instagram.com OR site:facebook.com OR site:tiktok.com OR site:linkedin.com)[ {ciudad}]'},
+      {label:'CV o currículum expuesto',q:'{nombre|name} (filetype:pdf OR filetype:doc OR filetype:docx) ("curriculum vitae" OR "currículum" OR "CV") ("teléfono" OR "email" OR "DNI")'},
+      {label:'Posibles correos corporativos (juan.garcia@, jgarcia@…)',q:'{nombre|alias}'},
+      {label:'Documentos que mencionan a la persona',q:'{nombre|name} (filetype:pdf OR filetype:docx OR filetype:xlsx) site:es'},
+      {label:'Persona en contratos públicos',q:'site:contrataciondelestado.es {nombre|name}'},
+      {label:'Persona en listados de oposiciones y resoluciones',q:'{nombre|name} ("admitidos" OR "aprobados" OR "lista definitiva" OR "resolución" OR "adjudicación") filetype:pdf site:es'},
+      {label:'Persona en noticias de prensa nacional',q:'{nombre|name} (site:elpais.com OR site:elmundo.es OR site:abc.es OR site:lavanguardia.com OR site:elconfidencial.com OR site:20minutos.es)[ {ciudad}]'},
+      {label:'Persona en prensa regional (Galicia)',q:'{nombre|name} (site:lavozdegalicia.es OR site:farodevigo.es OR site:elprogreso.es OR site:diariodepontevedra.es OR site:atlantico.net OR site:galiciapress.es)'},
+      {label:'Persona en noticias judiciales y sucesos',q:'{nombre|name} ("sentencia" OR "condenado" OR "imputado" OR "detenido" OR "investigado" OR "juzgado") site:es'},
     ]},
   ]
 },
@@ -708,12 +733,15 @@ const SECTIONS = [
       {name:'Advanced Phone Number OSINT',url:'https://medium.com/@marvelous678/advanced-phone-number-osint-ddabfe3d0bb5',desc:'Artículo avanzado sobre técnicas OSINT aplicadas a la investigación de números telefónicos.',tags:['avanzado','técnicas','artículo']},
     ]},
     {label:'🔍 Dorks',isDorks:true,dorks:[
-      {label:'Número móvil español en redes sociales',query:'"6XX XXX XXX" OR "+346XXXXXXXXX" site:facebook.com OR site:twitter.com'},
-      {label:'Teléfono en documentos PDF españoles',query:'filetype:pdf "+34 6" site:*.es'},
-      {label:'Número en foros españoles',query:'"6XX XXX XXX" site:forocoches.com OR site:elotrolado.net OR site:mediavida.com'},
-      {label:'Teléfono en páginas empresariales',query:'"tel:" OR "teléfono:" "+34 6" site:*.es'},
-      {label:'Número en WHOIS de dominios',query:'site:whois.domaintools.com "+34 6"'},
-      {label:'Teléfono en registros oficiales',query:'"teléfono" "6XX" site:boe.es OR site:borme.es'},
+      {label:'Teléfono en redes sociales y mensajería',q:'{telefono|phone} (site:facebook.com OR site:instagram.com OR site:x.com OR site:linkedin.com OR site:t.me OR site:tiktok.com)'},
+      {label:'Teléfono en documentos públicos',q:'{telefono|phone} (filetype:pdf OR filetype:doc OR filetype:docx OR filetype:xls OR filetype:xlsx OR filetype:csv OR filetype:txt)'},
+      {label:'Teléfono en anuncios y marketplaces',q:'{telefono|phone} (site:milanuncios.com OR site:wallapop.com OR site:vibbo.com OR site:idealista.com OR site:fotocasa.es OR site:segundamano.es)'},
+      {label:'Teléfono en foros españoles',q:'{telefono|phone} (site:forocoches.com OR site:elotrolado.net OR site:mediavida.com OR site:burbuja.info)'},
+      {label:'Teléfono en webs de titular (aviso legal / contacto)',q:'{telefono|phone} ("aviso legal" OR "contacto" OR "titular" OR "quiénes somos") site:es'},
+      {label:'Teléfono en listas de spam y llamadas molestas',q:'{telefono|phone} (site:listaspam.com OR site:responderono.es OR site:tellows.es OR site:cuantoscobran.com)'},
+      {label:'Teléfono asociado a fraude o estafa',q:'{telefono|phone} ("estafa" OR "fraude" OR "timo" OR "phishing" OR "vishing" OR "extorsión" OR "denuncia")'},
+      {label:'Teléfono en pastes y volcados',q:'{telefono|phone} (site:pastebin.com OR site:paste.ee OR site:rentry.co OR site:ghostbin.co OR site:controlc.com OR site:justpaste.it)'},
+      {label:'Enlaces de WhatsApp y Telegram con ese número',q:'(inurl:"wa.me/{telefono|intl}" OR inurl:"phone={telefono|intl}" OR inurl:"api.whatsapp.com" "{telefono|intl}")'},
     ]},
   ]
 },
@@ -750,11 +778,16 @@ const SECTIONS = [
       {name:'Breachdirectory',url:'https://breachdirectory.org',desc:'Busca emails en filtraciones y muestra contraseñas parciales hasheadas asociadas.',tags:['filtraciones','contraseñas','hash']},
     ]},
     {label:'🔍 Dorks',isDorks:true,dorks:[
-      {label:'Email en documentos PDF públicos',query:'"@gmail.com" OR "@hotmail.com" filetype:pdf site:*.es'},
-      {label:'Emails corporativos expuestos',query:'"@empresa.es" filetype:pdf OR filetype:xlsx OR filetype:doc'},
-      {label:'Email en registros WHOIS',query:'site:whois.domaintools.com "@gmail.com" "registrant"'},
-      {label:'Email en filtraciones Pastebin',query:'site:pastebin.com "@" "password" OR "contraseña"'},
-      {label:'Emails en documentos de licitaciones',query:'"@" "correo" OR "email" site:contrataciondelestado.es filetype:pdf'},
+      {label:'Correo en toda la web (incluye formas ofuscadas [at], (at), arroba)',q:'{email|email}'},
+      {label:'Correo en documentos públicos',q:'{email|email} (filetype:pdf OR filetype:doc OR filetype:docx OR filetype:xls OR filetype:xlsx OR filetype:csv OR filetype:txt)'},
+      {label:'Correo en pastes y volcados',q:'{email|email} (site:pastebin.com OR site:paste.ee OR site:rentry.co OR site:ghostbin.co OR site:controlc.com OR site:justpaste.it)'},
+      {label:'Correo junto a contraseñas o credenciales',q:'{email|email} ("password" OR "contraseña" OR "passwd" OR "pass:" OR "hash")'},
+      {label:'Correo en repositorios de código',q:'{email|email} (site:github.com OR site:gitlab.com OR site:bitbucket.org OR site:gist.github.com)'},
+      {label:'Usuario del correo como alias en redes',q:'{email|local} (site:x.com OR site:instagram.com OR site:facebook.com OR site:github.com OR site:reddit.com OR site:tiktok.com OR site:youtube.com)'},
+      {label:'Otros correos del mismo dominio',q:'"@{email|edomain}" (filetype:pdf OR filetype:doc OR filetype:docx OR filetype:xls OR filetype:xlsx OR filetype:csv OR filetype:txt)'},
+      {label:'Correo asociado a fraude, phishing o denuncias',q:'{email|email} ("estafa" OR "fraude" OR "phishing" OR "denuncia" OR "extorsión" OR "timo")'},
+      {label:'Correo en avisos legales y datos de titular',q:'{email|email} ("aviso legal" OR "titular" OR "responsable" OR "contacto")'},
+      {label:'Correo en registros y dominios (WHOIS público)',q:'{email|email} (site:whoxy.com OR site:viewdns.info OR site:who.is OR site:whois.com)'},
     ]},
   ]
 },
@@ -777,11 +810,15 @@ const SECTIONS = [
       {name:'IntelX Username',url:'https://intelx.io/tools?tab=username',desc:'Busca un nombre de usuario en filtraciones, pastes y dark web de la base de datos IntelX.',tags:['darkweb','filtraciones','intelx']},
     ]},
     {label:'🔍 Dorks',isDorks:true,dorks:[
-      {label:'Usuario en múltiples redes',query:'"nombreusuario" site:twitter.com OR site:instagram.com OR site:reddit.com'},
-      {label:'Usuario en Pastebin y pastes',query:'site:pastebin.com "nombreusuario"'},
-      {label:'Perfil GitHub de usuario',query:'site:github.com "nombreusuario"'},
-      {label:'Usuario en comentarios YouTube',query:'site:youtube.com "nombreusuario"'},
-      {label:'Usuario en foros de filtraciones',query:'"nombreusuario" site:raidforums.com OR site:breachforums.com OR site:nulled.to'},
+      {label:'Alias en redes sociales principales',q:'{usuario|user} (site:x.com OR site:twitter.com OR site:instagram.com OR site:facebook.com OR site:tiktok.com OR site:reddit.com OR site:youtube.com OR site:t.me)'},
+      {label:'URLs de perfil directas en varias plataformas',q:'(inurl:"instagram.com/{usuario|uraw}" OR inurl:"x.com/{usuario|uraw}" OR inurl:"tiktok.com/@{usuario|uraw}" OR inurl:"github.com/{usuario|uraw}" OR inurl:"reddit.com/user/{usuario|uraw}" OR inurl:"t.me/{usuario|uraw}" OR inurl:"facebook.com/{usuario|uraw}")'},
+      {label:'Alias fuera de las grandes redes (presencia secundaria)',q:'{usuario|user} -site:facebook.com -site:instagram.com -site:x.com -site:twitter.com -site:linkedin.com -site:tiktok.com -site:youtube.com'},
+      {label:'Perfil de foro (patrones de URL habituales)',q:'(inurl:"/members/{usuario|uraw}" OR inurl:"/user/{usuario|uraw}" OR inurl:"/users/{usuario|uraw}" OR inurl:"/profile/{usuario|uraw}" OR inurl:"/u/{usuario|uraw}")'},
+      {label:'Agregadores de enlaces (Linktree, bio.link…)',q:'(site:linktr.ee OR site:bio.link OR site:beacons.ai OR site:carrd.co OR site:solo.to OR site:linkin.bio) {usuario|user}'},
+      {label:'Alias en código y gists (GitHub, GitLab)',q:'(site:github.com OR site:gist.github.com OR site:gitlab.com OR site:bitbucket.org) {usuario|user}'},
+      {label:'Alias en pastes y volcados',q:'{usuario|user} (site:pastebin.com OR site:paste.ee OR site:rentry.co OR site:ghostbin.co OR site:controlc.com OR site:justpaste.it)'},
+      {label:'Alias en plataformas de juegos y creadores',q:'(site:steamcommunity.com OR site:twitch.tv OR site:pinterest.com OR site:medium.com OR site:tumblr.com OR site:soundcloud.com OR site:patreon.com) {usuario|user}'},
+      {label:'Alias en foros de hacking y filtraciones',q:'{usuario|user} (site:xss.is OR site:exploit.in OR site:nulled.to OR site:cracked.io OR site:breachforums.st OR site:hackforums.net)'},
     ]},
   ]
 },
@@ -847,13 +884,17 @@ const SECTIONS = [
       {name:'FDown',url:'https://fdown.net',desc:'Descargador de vídeos de Facebook por URL, compatible con vídeos públicos y privados.',tags:['facebook','descarga','vídeo']},
     ]},
     {label:'🔍 Dorks',isDorks:true,dorks:[
-      {label:'Perfil Instagram en Google',query:'site:instagram.com "nombre usuario" OR "@usuario"'},
-      {label:'Publicaciones Facebook de persona',query:'site:facebook.com "nombre apellido" "ciudad" OR "trabajo"'},
-      {label:'Vídeos YouTube de persona',query:'site:youtube.com "nombre apellido"'},
-      {label:'Perfil Reddit de usuario',query:'site:reddit.com/user/ "nombreusuario"'},
-      {label:'Canal Telegram relacionado',query:'site:t.me "palabra clave" OR "tema investigación"'},
-      {label:'Perfil TikTok',query:'site:tiktok.com/@"nombreusuario"'},
-      {label:'Servidor Discord por temática',query:'site:disboard.org "tema" "idioma español"'},
+      {label:'Instagram: perfil por usuario',q:'site:instagram.com {usuario|user}'},
+      {label:'Instagram: perfil por nombre',q:'site:instagram.com {nombre|name}[ {ciudad}]'},
+      {label:'Facebook: publicaciones y perfil de persona',q:'site:facebook.com {nombre|name}[ {ciudad}]'},
+      {label:'X / Twitter: menciones de un usuario',q:'(site:x.com OR site:twitter.com) {usuario|user}'},
+      {label:'YouTube: vídeos y canales de persona',q:'site:youtube.com {nombre|name}'},
+      {label:'Reddit: perfil y comentarios de usuario',q:'(site:reddit.com/user/{usuario|uraw} OR site:reddit.com {usuario|user})'},
+      {label:'TikTok: perfil y vídeos',q:'site:tiktok.com {usuario|user}'},
+      {label:'Telegram: canales y grupos por temática',q:'(site:t.me OR site:telegram.me OR site:tgstat.com OR site:telemetr.io) {tema|or}'},
+      {label:'Grupos de WhatsApp públicos por temática',q:'inurl:"chat.whatsapp.com" {tema|or}'},
+      {label:'Servidores de Discord por temática',q:'(site:disboard.org OR site:discord.me OR site:discords.com OR inurl:"discord.gg") {tema|or}'},
+      {label:'Persona en varias redes a la vez',q:'{nombre|name} (site:x.com OR site:twitter.com OR site:instagram.com OR site:facebook.com OR site:tiktok.com OR site:linkedin.com)[ {ciudad}]'},
     ]},
   ]
 },
@@ -915,10 +956,14 @@ const SECTIONS = [
       {name:'Vehicle AI',url:'https://vehicle-ai.net',desc:'Identifica marca, modelo y año de vehículos a partir de fotos.',tags:['vehículos','modelo','identificación']},
     ]},
     {label:'🔍 Dorks',isDorks:true,dorks:[
-      {label:'Imágenes de una persona',query:'"nombre apellido" filetype:jpg OR filetype:png OR filetype:jpeg'},
-      {label:'Fotos con metadatos GPS en Flickr',query:'site:flickr.com "lugar" "GPS" "coordenadas"'},
-      {label:'Imágenes en documentos públicos',query:'filetype:pdf "fotografía" OR "imagen" site:*.es "nombre"'},
-      {label:'Fotos de evento en Google',query:'"nombre evento" "fecha" filetype:jpg OR filetype:png'},
+      {label:'Imágenes de una persona (Google Imágenes)',q:'{nombre|name}',img:true},
+      {label:'Imágenes alojadas en un dominio (Google Imágenes)',q:'site:{dominio|domain}',img:true},
+      {label:'Fotos de un evento (Google Imágenes)',q:'{evento|q}[ {fecha|raw}]',img:true},
+      {label:'Fotos de un lugar concreto (Google Imágenes)',q:'{lugar|q}',img:true},
+      {label:'Documentos con fotografías de la persona',q:'{nombre|name} (filetype:pdf OR filetype:docx OR filetype:pptx) ("fotografía" OR "foto" OR "imagen")'},
+      {label:'Galerías de Flickr de un lugar (con GPS)',q:'site:flickr.com/photos {lugar|q}'},
+      {label:'Imágenes originales subidas a un sitio (WordPress uploads)',q:'site:{dominio|domain} inurl:"wp-content/uploads" (ext:jpg OR ext:jpeg OR ext:png OR ext:tif)'},
+      {label:'Fotos de la persona en redes (búsqueda web)',q:'{nombre|name} (site:instagram.com OR site:facebook.com OR site:flickr.com OR site:pinterest.com OR site:500px.com)'},
     ]},
   ]
 },
@@ -947,10 +992,14 @@ const SECTIONS = [
       {name:'Catastro Inmuebles',url:'https://www1.sedecatastro.gob.es/CYCBienInmueble/OVCBusqueda.aspx',desc:'Búsqueda de bienes inmuebles en el Catastro español: titularidad, superficie y valor catastral.',tags:['catastro','inmuebles','españa']},
     ]},
     {label:'🔍 Dorks',isDorks:true,dorks:[
-      {label:'Coordenadas GPS en documentos',query:'"coordenadas" OR "latitud" OR "longitud" filetype:pdf site:*.es'},
-      {label:'Mapas de ubicaciones en redes',query:'"ubicación" OR "location" site:instagram.com "ciudad"'},
-      {label:'Datos catastrales de inmueble',query:'site:catastro.meh.es "referencia catastral"'},
-      {label:'Imágenes satélite de evento',query:'"imagen satélite" OR "foto aérea" "lugar" "fecha" site:*.es'},
+      {label:'Coordenadas GPS y UTM en documentos',q:'{lugar|q} ("coordenadas" OR "latitud" OR "longitud" OR "UTM" OR "lat/long") (filetype:pdf OR filetype:xlsx OR filetype:kml OR filetype:kmz)'},
+      {label:'Páginas de ubicación en redes (Instagram, Facebook, Foursquare)',q:'(site:instagram.com/explore/locations OR site:facebook.com/places OR site:foursquare.com) {lugar|q}'},
+      {label:'Referencia catastral en documentos',q:'{refcat|q} ("referencia catastral" OR "catastro" OR "inmueble")'},
+      {label:'Dirección en boletines oficiales',q:'{lugar|q} (site:boe.es OR site:dog.xunta.gal OR site:bocm.es OR site:boja.juntadeandalucia.es OR site:bopb.diba.cat)'},
+      {label:'Anuncios inmobiliarios de una dirección o zona',q:'{lugar|q} (site:idealista.com OR site:fotocasa.es OR site:habitaclia.com OR site:pisos.com)'},
+      {label:'Webcams públicas de una localidad',q:'{ciudad|q} (intitle:webcam OR intitle:"cámara en directo" OR inurl:webcam OR inurl:camara)'},
+      {label:'Ortofotos e imágenes aéreas de la zona',q:'{lugar|q} ("imagen satélite" OR "ortofoto" OR "foto aérea" OR "vuelo americano") site:es'},
+      {label:'Archivos KML, KMZ y GPX de la zona',q:'{lugar|q} (filetype:kml OR filetype:kmz OR filetype:gpx)'},
     ]},
   ]
 },
@@ -1024,12 +1073,18 @@ const SECTIONS = [
       {name:'InfolByIP',url:'https://www.infobyip.com',desc:'Información detallada de IPs y dominios con análisis de geolocalización.',tags:['IP','dominio','información']},
     ]},
     {label:'🔍 Dorks',isDorks:true,dorks:[
-      {label:'Subdominios de un objetivo',query:'site:*.dominio.com -www'},
-      {label:'Archivos de configuración expuestos',query:'site:dominio.com filetype:conf OR filetype:cfg OR filetype:env'},
-      {label:'Panel de administración expuesto',query:'site:dominio.com inurl:"/admin" OR inurl:"/login" OR inurl:"/wp-admin"'},
-      {label:'Dominios registrados por mismo email',query:'site:whoxy.com "email@dominio.com"'},
-      {label:'Certificados SSL de subdominio',query:'site:crt.sh "%.dominio.com"'},
-      {label:'IP en reportes de abuso',query:'site:abuseipdb.com "X.X.X.X"'},
+      {label:'Subdominios indexados',q:'site:*.{dominio|domain} -site:www.{dominio|domain}'},
+      {label:'Documentos públicos del dominio',q:'site:{dominio|domain} (filetype:pdf OR filetype:docx OR filetype:xlsx OR filetype:pptx OR filetype:csv)'},
+      {label:'Ficheros de configuración y secretos expuestos',q:'site:{dominio|domain} (ext:env OR ext:cfg OR ext:conf OR ext:ini OR ext:yml OR ext:json OR ext:xml) ("password" OR "DB_PASSWORD" OR "API_KEY" OR "secret")'},
+      {label:'Paneles de login y administración',q:'site:{dominio|domain} (inurl:admin OR inurl:login OR inurl:wp-admin OR inurl:administrator OR inurl:cpanel)'},
+      {label:'Entornos de pruebas y desarrollo',q:'site:{dominio|domain} (inurl:dev OR inurl:staging OR inurl:test OR inurl:beta OR inurl:demo OR inurl:preprod)'},
+      {label:'Listados de directorios abiertos',q:'site:{dominio|domain} intitle:"index of"'},
+      {label:'Menciones externas del dominio (sin el propio sitio)',q:'"{dominio|domain}" -site:{dominio|domain}'},
+      {label:'Dominios vinculados a un correo de registrante',q:'{email|email} (site:whoxy.com OR site:viewdns.info OR site:securitytrails.com OR site:who.is)'},
+      {label:'Páginas de login que imitan a una marca (posible phishing)',q:'intitle:{empresa|q} (inurl:login OR inurl:verify OR inurl:secure OR inurl:account OR inurl:signin) -site:{dominio|domain}'},
+      {label:'IP en reportes de abuso y amenazas',q:'{ip} (site:abuseipdb.com OR site:virustotal.com OR site:otx.alienvault.com OR site:urlhaus.abuse.ch OR site:threatfox.abuse.ch)'},
+      {label:'IP en pastes y repositorios',q:'{ip} (site:pastebin.com OR site:github.com OR site:gitlab.com OR site:gist.github.com)'},
+      {label:'IP en logs y documentos',q:'{ip} (filetype:log OR filetype:txt OR filetype:csv OR filetype:pdf)'},
     ]},
   ]
 },
@@ -1051,10 +1106,15 @@ const SECTIONS = [
       {name:'IntelX',url:'https://intelx.io',desc:'Motor de búsqueda especializado en datos filtrados, dark web, Tor y archivos históricos.',tags:['darkweb','filtraciones','archivo']},
     ]},
     {label:'🔍 Dorks',isDorks:true,dorks:[
-      {label:'Credenciales en Pastebin',query:'site:pastebin.com "email" "password" "contraseña"'},
-      {label:'Filtraciones de empresa en Pastebin',query:'site:pastebin.com "empresa.es" "password" OR "user"'},
-      {label:'Datos personales expuestos en pastes',query:'site:paste.ee OR site:ghostbin.co "DNI" OR "NIF" "contraseña"'},
-      {label:'Archivos con credenciales en GitHub',query:'site:github.com "password" "username" "API_KEY" filename:.env'},
+      {label:'Credenciales de un correo en pastes',q:'{email|email} ("password" OR "contraseña" OR "pass") (site:pastebin.com OR site:paste.ee OR site:rentry.co OR site:ghostbin.co OR site:controlc.com OR site:justpaste.it)'},
+      {label:'Credenciales de un dominio en pastes',q:'"@{dominio|domain}" ("password" OR "user" OR "pass" OR "contraseña") (site:pastebin.com OR site:paste.ee OR site:rentry.co OR site:ghostbin.co OR site:controlc.com OR site:justpaste.it)'},
+      {label:'Datos personales (DNI/NIF) y contraseñas en pastes',q:'("DNI" OR "NIF") ("contraseña" OR "password")[ {tema|or}] (site:pastebin.com OR site:paste.ee OR site:rentry.co OR site:ghostbin.co OR site:controlc.com OR site:justpaste.it)'},
+      {label:'Secretos de un dominio en GitHub',q:'site:github.com "{dominio|domain}" ("password" OR "API_KEY" OR "secret" OR "token" OR "smtp" OR "aws_access_key")'},
+      {label:'Fragmentos de código (gists, snippets) con un dominio',q:'(site:gist.github.com OR site:gitlab.com OR site:bitbucket.org) "{dominio|domain}" ("password" OR "secret" OR "token")'},
+      {label:'Empresa en anuncios y noticias de filtraciones',q:'{empresa|q} ("data breach" OR "leaked" OR "dump" OR "combolist" OR "filtración" OR "brecha de datos" OR "ciberataque")'},
+      {label:'Buckets en la nube que citan el dominio',q:'(site:s3.amazonaws.com OR site:blob.core.windows.net OR site:storage.googleapis.com OR site:digitaloceanspaces.com) "{dominio|domain}"'},
+      {label:'Tableros y wikis públicos con el dominio (Trello, Notion, Jira)',q:'(site:trello.com OR site:notion.site OR site:atlassian.net OR site:airtable.com OR site:miro.com) "{dominio|domain}"'},
+      {label:'Volcados y bases de datos indexadas de un dominio',q:'site:{dominio|domain} (ext:sql OR ext:csv OR ext:xlsx OR ext:bak) ("email" OR "password" OR "usuario" OR "INSERT INTO")'},
     ]},
   ]
 },
@@ -1087,12 +1147,18 @@ const SECTIONS = [
       {name:'TMDN TMview',url:'https://www.tmdn.org/tmview/#/tmview/',desc:'Base de datos europea de marcas registradas gestionada por la EUIPO.',tags:['marcas','EUIPO','europa']},
     ]},
     {label:'🔍 Dorks',isDorks:true,dorks:[
-      {label:'Empresa en BORME España',query:'site:boe.es "nombre empresa" "nombramiento" OR "cese" OR "disolución"'},
-      {label:'CIF de empresa en documentos',query:'"CIF" OR "NIF" "nombre empresa" filetype:pdf site:*.es'},
-      {label:'Contratos públicos adjudicados',query:'site:contrataciondelestado.es "nombre empresa"'},
-      {label:'Subvenciones recibidas',query:'site:transparencia.gob.es "nombre empresa" "subvención" OR "ayuda"'},
-      {label:'Empresa en Panama Papers',query:'site:offshoreleaks.icij.org "nombre empresa"'},
-      {label:'Directivos en LinkedIn',query:'site:linkedin.com/in/ "empresa" "director" OR "CEO" OR "administrador"'},
+      {label:'Empresa en BORME (nombramientos, ceses, disoluciones)',q:'site:boe.es {empresa|q} ("nombramiento" OR "cese" OR "disolución" OR "constitución" OR "apoderado" OR "administrador único")'},
+      {label:'CIF/NIF en documentos públicos',q:'{cif|q} (filetype:pdf OR filetype:xlsx OR filetype:docx)'},
+      {label:'CIF/NIF en directorios de empresas',q:'{cif|q} (site:einforma.com OR site:infocif.es OR site:empresite.eleconomista.es OR site:axesor.es OR site:ranking-empresas.eleconomista.es)'},
+      {label:'Webs cuyo aviso legal cita este CIF',q:'{cif|q} ("aviso legal" OR "titular" OR "responsable del sitio" OR "condiciones generales")'},
+      {label:'Contratos públicos adjudicados',q:'site:contrataciondelestado.es {empresa|q}'},
+      {label:'Subvenciones y ayudas recibidas',q:'{empresa|q} (site:infosubvenciones.es OR site:transparencia.gob.es OR site:boe.es) ("subvención" OR "ayuda" OR "beneficiario")'},
+      {label:'Empresa en Offshore Leaks (ICIJ)',q:'site:offshoreleaks.icij.org {empresa|q}'},
+      {label:'Directivos y empleados en LinkedIn',q:'site:linkedin.com/in/ {empresa|q} ("director" OR "CEO" OR "administrador" OR "gerente" OR "fundador" OR "socio")'},
+      {label:'Sanciones y advertencias oficiales (CNMV, AEPD, CNMC…)',q:'{empresa|q} (site:cnmv.es OR site:aepd.es OR site:cnmc.es OR site:bde.es OR site:consumo.gob.es)'},
+      {label:'Opiniones, denuncias y estafas',q:'{empresa|q} ("estafa" OR "fraude" OR "denuncia" OR "timo" OR "opiniones" OR "no paga")'},
+      {label:'Ofertas de empleo sospechosas (posible fraude)',q:'{empresa|q} ("oferta de empleo" OR "trabajo desde casa" OR "teletrabajo" OR "contratación inmediata") ("WhatsApp" OR "Telegram")'},
+      {label:'Directivo o administrador en documentos societarios',q:'{nombre|name} ("administrador" OR "apoderado" OR "consejero" OR "socio único") (site:boe.es OR filetype:pdf)'},
     ]},
   ]
 },
@@ -1120,10 +1186,15 @@ const SECTIONS = [
       {name:'OFAC SDN List',url:'https://sanctionssearch.ofac.treas.gov',desc:'Lista de sanciones del Tesoro de EE.UU. Busca personas, empresas y países sancionados.',tags:['OFAC','sanciones','EE.UU.']},
     ]},
     {label:'🔍 Dorks',isDorks:true,dorks:[
-      {label:'IBAN en documentos públicos',query:'"ES" "IBAN" OR "cuenta bancaria" filetype:pdf site:*.es'},
-      {label:'Datos bancarios en documentos empresa',query:'"nombre empresa" "CIF" "cuenta corriente" filetype:pdf'},
-      {label:'Contratos con importe público',query:'site:contrataciondelestado.es "nombre" "importe" filetype:pdf'},
-      {label:'Subvenciones BDNS',query:'site:infosubvenciones.es "nombre empresa" "beneficiario"'},
+      {label:'IBAN en toda la web (con y sin espacios)',q:'{iban|iban}'},
+      {label:'IBAN en documentos públicos',q:'{iban|iban} (filetype:pdf OR filetype:xlsx OR filetype:docx OR filetype:csv)'},
+      {label:'IBAN asociado a estafas o denuncias',q:'{iban|iban} ("estafa" OR "fraude" OR "transferencia" OR "denuncia" OR "timo")'},
+      {label:'Datos bancarios publicados por una empresa',q:'{empresa|q} ("IBAN" OR "cuenta corriente" OR "nº de cuenta" OR "transferencia") (filetype:pdf OR filetype:xlsx)'},
+      {label:'Facturas y documentos con datos bancarios',q:'{empresa|q} ("factura" OR "base imponible" OR "IBAN") filetype:pdf'},
+      {label:'Contratos con importe público',q:'site:contrataciondelestado.es {empresa|q} ("importe" OR "adjudicación" OR "valor estimado") filetype:pdf'},
+      {label:'Subvenciones en la BDNS',q:'site:infosubvenciones.es {empresa|q}'},
+      {label:'Entidades no autorizadas y chiringuitos (CNMV / Banco de España)',q:'{empresa|q} (site:cnmv.es OR site:bde.es) ("advertencia" OR "no autorizada" OR "chiringuito")'},
+      {label:'Enlaces de cobro y donación del alias (PayPal.me, Ko-fi…)',q:'(inurl:"paypal.me/{usuario|uraw}" OR inurl:"ko-fi.com/{usuario|uraw}" OR inurl:"buymeacoffee.com/{usuario|uraw}" OR inurl:"patreon.com/{usuario|uraw}")'},
     ]},
   ]
 },
@@ -1156,10 +1227,15 @@ const SECTIONS = [
       {name:'Vídeo investigación blockchain',url:'https://youtu.be/_rke7phTpLQ',desc:'Vídeo tutorial sobre técnicas de investigación de transacciones en blockchain.',tags:['youtube','tutorial','blockchain']},
     ]},
     {label:'🔍 Dorks',isDorks:true,dorks:[
-      {label:'Wallet Bitcoin en foros',query:'"bc1" OR "1A" "wallet" site:bitcointalk.org'},
-      {label:'Dirección Ethereum en documentos',query:'"0x" "ethereum" OR "ETH" filetype:pdf'},
-      {label:'Wallet en reportes de fraude',query:'site:bitcoinabuse.com "wallet"'},
-      {label:'Criptomonedas en noticias delictivas España',query:'"bitcoin" OR "criptomoneda" "detenido" OR "investigación" site:*.es'},
+      {label:'Dirección de wallet en toda la web',q:'{wallet|q}'},
+      {label:'Wallet en foros, código y pastes',q:'{wallet|q} (site:bitcointalk.org OR site:reddit.com OR site:github.com OR site:pastebin.com OR site:gist.github.com)'},
+      {label:'Wallet en bases de datos de fraude y abuso',q:'{wallet|q} (site:bitcoinabuse.com OR site:chainabuse.com OR site:scamsearch.io OR site:cryptoscamdb.org)'},
+      {label:'Wallet en explorador con etiquetas (Etherscan)',q:'{wallet|q} (site:etherscan.io OR site:blockchair.com OR site:blockchain.com)'},
+      {label:'Wallet en documentos y ficheros de texto',q:'{wallet|q} (filetype:pdf OR filetype:txt OR filetype:csv OR filetype:xlsx)'},
+      {label:'Wallet en redes sociales y Telegram',q:'{wallet|q} (site:t.me OR site:x.com OR site:twitter.com OR site:reddit.com OR site:facebook.com OR site:instagram.com)'},
+      {label:'Wallet ligada a estafa, extorsión o ransomware',q:'{wallet|q} ("scam" OR "estafa" OR "ransomware" OR "sextorsión" OR "extorsión" OR "phishing")'},
+      {label:'Alias como dominio cripto (.eth, .crypto, .sol)',q:'("{usuario|uraw}.eth" OR "{usuario|uraw}.crypto" OR "{usuario|uraw}.sol")'},
+      {label:'Casos de estafas cripto en prensa española',q:'("bitcoin" OR "criptomoneda" OR "criptomonedas") ("detenido" OR "detenidos" OR "estafa" OR "investigación") site:es[ {tema|or}]'},
     ]},
   ]
 },
@@ -1173,8 +1249,12 @@ const SECTIONS = [
       {name:'Dating Profile Generator',url:'https://www.dating-profile-generator.org.uk',desc:'Genera perfiles de citas ficticios para crear leyendas de sockpuppets.',tags:['perfil','citas','leyenda']},
     ]},
     {label:'🔍 Dorks',isDorks:true,dorks:[
-      {label:'Detectar foto de perfil de stock',query:'"esta foto" OR "foto de perfil" site:unsplash.com OR site:pexels.com'},
-      {label:'Detectar perfil falso en redes',query:'"joined" "2023" OR "2024" "0 posts" site:twitter.com OR site:instagram.com'},
+      {label:'Bio o frase copiada en varias redes (identidades vinculadas)',q:'{frase|q} (site:x.com OR site:twitter.com OR site:instagram.com OR site:facebook.com OR site:tiktok.com OR site:linkedin.com)'},
+      {label:'Alias reutilizado fuera de las grandes redes',q:'{usuario|user} -site:facebook.com -site:instagram.com -site:x.com -site:twitter.com -site:linkedin.com -site:tiktok.com'},
+      {label:'Perfil denunciado como falso o suplantación (por alias)',q:'{usuario|user} ("perfil falso" OR "cuenta falsa" OR "suplantación" OR "estafador" OR "fake account" OR "scammer")'},
+      {label:'Perfil denunciado como falso o suplantación (por nombre)',q:'{nombre|name} ("perfil falso" OR "suplantación de identidad" OR "estafador" OR "fake" OR "catfish")'},
+      {label:'Nombre asociado a estafas amorosas o romance scam',q:'{nombre|name} ("estafa amorosa" OR "romance scam" OR "estafa del amor" OR "catfish")'},
+      {label:'Foto o texto de perfil en listas de cuentas falsas',q:'{frase|q} ("cuentas falsas" OR "perfiles falsos" OR "fake profiles" OR "bot")'},
     ]},
   ]
 },
@@ -1330,29 +1410,201 @@ function makeLinkCard(link, color) {
   return card;
 }
 
+/* ===== Generador de dorks: el término se escribe en la tarjeta y la consulta se construye sola ===== */
+const DORK_FIELDS = {
+  nombre:{l:'Nombre y apellidos',ph:'Juan García López'},
+  telefono:{l:'Teléfono',ph:'612 345 678'},
+  email:{l:'Correo electrónico',ph:'nombre@dominio.com'},
+  dominio:{l:'Dominio',ph:'ejemplo.com'},
+  usuario:{l:'Usuario / alias',ph:'nombreusuario'},
+  empresa:{l:'Empresa',ph:'Razón social'},
+  cif:{l:'CIF / NIF',ph:'B12345678'},
+  ip:{l:'Dirección IP',ph:'203.0.113.10'},
+  iban:{l:'IBAN',ph:'ES91 2100 0418 4502 0005 1332'},
+  wallet:{l:'Dirección de wallet',ph:'bc1q… / 0x…'},
+  tema:{l:'Tema o palabra clave',ph:'palabra1, palabra2'},
+  frase:{l:'Frase / bio a rastrear',ph:'texto exacto'},
+  ciudad:{l:'Ciudad / provincia',ph:'Vigo'},
+  lugar:{l:'Lugar o dirección',ph:'Plaza de Cibeles, Madrid'},
+  evento:{l:'Evento',ph:'nombre del evento'},
+  fecha:{l:'Año / fecha',ph:'2024'},
+  refcat:{l:'Referencia catastral',ph:'0000000XX0000X0000XX'}
+};
+const DORK_VALS = {};
+const dkClean = v => String(v||'').replace(/["“”„«»]/g,'').replace(/\s+/g,' ').trim();
+const dkNorm = s => s.normalize('NFD').replace(/[̀-ͯ]/g,'');
+const dkQ = s => '"'+s+'"';
+const dkGroup = arr => { arr=[...new Set(arr.filter(Boolean))]; return arr.length===1 ? dkQ(arr[0]) : '('+arr.map(dkQ).join(' OR ')+')'; };
+const DK_MODS = {
+  q: v => dkQ(v),
+  raw: v => v,
+  name(v){
+    const w = v.split(' ').filter(Boolean);
+    if(w.length<2) return dkQ(v);
+    if(w.length===2) return dkGroup([v, w[1]+' '+w[0], w[1]+', '+w[0]]);
+    const given = w.slice(0,-2).join(' ') || w[0];
+    const sur2 = w.slice(-2).join(' ');
+    const givenN = w.slice(0,-2).join(' ');
+    return dkGroup([v, sur2+', '+(givenN||w[0]), (givenN||w[0])+' '+w[w.length-2]]);
+  },
+  alias(v){
+    const w = dkNorm(v).toLowerCase().replace(/[^a-z\s]/g,'').split(' ').filter(Boolean);
+    if(w.length<2) return dkQ((w[0]||v)+'@');
+    const f=w[0], l=w.length>=3 ? w[w.length-2] : w[w.length-1], l2=w[w.length-1];
+    const out=[f+'.'+l, f+'_'+l, f+l, f[0]+l, f[0]+'.'+l, f+'.'+l2, f[0]+l2];
+    return dkGroup(out.map(x=>x+'@'));
+  },
+  phone(v){
+    let d = v.replace(/\D/g,'');
+    if(d.startsWith('0034')) d=d.slice(4); else if(d.length===11 && d.startsWith('34')) d=d.slice(2);
+    if(d.length===9){
+      const a=d.slice(0,3), b=d.slice(3,6), c=d.slice(6);
+      return dkGroup([d, a+' '+b+' '+c, a+'-'+b+'-'+c, a+' '+d.slice(3,5)+' '+d.slice(5,7)+' '+d.slice(7),
+        '+34'+d, '+34 '+a+' '+b+' '+c, '0034'+d, '(+34) '+a+' '+b+' '+c]);
+    }
+    const dg = v.replace(/\D/g,'');
+    return dkGroup([v, dg, '+'+dg]);
+  },
+  intl(v){
+    let d = v.replace(/\D/g,'');
+    if(d.startsWith('00')) d=d.slice(2);
+    if(d.length===9) d='34'+d;
+    return d;
+  },
+  domain: v => v.toLowerCase().replace(/^[a-z][a-z0-9+.-]*:\/\//,'').replace(/^.*@/,'').split(/[\/?#:\s]/)[0].replace(/^www\./,''),
+  user: v => dkQ(DK_MODS.uraw(v)),
+  uraw(v){ v=v.replace(/[?#].*$/,'').replace(/\/+$/,''); return v.split('/').pop().replace(/^@/,'').replace(/\s+/g,''); },
+  local: v => dkQ(v.split('@')[0]),
+  edomain: v => (v.split('@')[1]||v).toLowerCase(),
+  or: v => dkGroup(v.split(/[,;]+/).map(dkClean)),
+  email(v){
+    const p=v.split('@');
+    if(p.length!==2||!p[1]) return dkQ(v);
+    return dkGroup([v, p[0]+' [at] '+p[1], p[0]+' (at) '+p[1], p[0]+' arroba '+p[1]]);
+  },
+  iban(v){
+    const c=v.replace(/\s+/g,'').toUpperCase();
+    return dkGroup([c, c.replace(/(.{4})/g,'$1 ').trim()]);
+  }
+};
+const dkEsc = s => String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
+const DK_TOK = /\{(\w+)(?:\|(\w+))?\}/g;
+
+/* Devuelve {text, html, complete, keys:[{key,optional}]} */
+function dkRender(tpl, vals){
+  const keys = new Map();
+  let complete = true;
+  const seg = (str, optional) => {
+    let t='', h='', last=0, m;
+    DK_TOK.lastIndex = 0;
+    while((m = DK_TOK.exec(str))){
+      const pre = str.slice(last, m.index);
+      t += pre; h += dkEsc(pre); last = m.index + m[0].length;
+      const key=m[1], mod=m[2]||'q';
+      if(!keys.has(key) || (keys.get(key) && !optional)) keys.set(key, optional);
+      const raw = dkClean(vals[key]);
+      if(raw){
+        const f = (DK_MODS[mod]||DK_MODS.q)(raw);
+        t += f; h += '<span class="dk-val">'+dkEsc(f)+'</span>';
+      } else {
+        const l = (DORK_FIELDS[key]||{}).l || key;
+        t += '{'+key+'}'; h += '<span class="dk-ph">‹'+dkEsc(l)+'›</span>';
+        if(!optional) complete = false;
+      }
+    }
+    const rest = str.slice(last);
+    return {t: t+rest, h: h+dkEsc(rest)};
+  };
+  let text='', html='';
+  tpl.split(/(\[[^\[\]]*\])/).forEach(part => {
+    if(part.startsWith('[') && part.endsWith(']')){
+      const inner = part.slice(1,-1);
+      const ks = [...inner.matchAll(DK_TOK)].map(x=>x[1]);
+      ks.forEach(k => { if(!keys.has(k)) keys.set(k,true); });
+      if(ks.some(k => !dkClean(vals[k]))) return;      /* grupo opcional sin rellenar: se omite */
+      const r = seg(inner, true); text += r.t; html += r.h;
+    } else {
+      const r = seg(part, false); text += r.t; html += r.h;
+    }
+  });
+  return {text:text.replace(/\s+/g,' ').trim(), html:html.replace(/\s+/g,' ').trim(), complete,
+          keys:[...keys].map(([key,optional])=>({key,optional}))};
+}
+const dkGoogleUrl = (q, img) => 'https://www.google.com/search?' + (img?'tbm=isch&':'') + 'q=' + encodeURIComponent(q);
+
 function makeDorkCard(dork, color) {
+  const tpl = dork.q || dork.query || '';
   const card = document.createElement('div');
   card.className = 'dork-card';
+  const info = dkRender(tpl, {});
+  const fields = info.keys.map(k => {
+    const f = DORK_FIELDS[k.key] || {l:k.key, ph:''};
+    return `<label class="dork-field"><span class="dork-flabel">${dkEsc(f.l)}${k.optional?' <em>(opcional)</em>':''}</span>` +
+           `<input class="dork-input" type="text" data-key="${k.key}" placeholder="${dkEsc(f.ph)}" autocomplete="off" spellcheck="false"></label>`;
+  }).join('');
   card.innerHTML = `
     <div class="dork-label">${dork.label}</div>
-    <div class="dork-code">${dork.query}</div>
+    ${fields ? `<div class="dork-fields">${fields}</div>` : ''}
+    <div class="dork-code"></div>
     <div class="dork-actions">
-      <button class="dork-btn dork-copy">📋 Copiar</button>
-      <button class="dork-btn dork-run">▶ Ejecutar en Google</button>
+      <button class="dork-btn dork-copy" type="button">📋 Copiar</button>
+      <button class="dork-btn dork-run" type="button">${dork.img ? '▶ Google Imágenes' : '▶ Ejecutar en Google'}</button>
     </div>
   `;
+  const code = card.querySelector('.dork-code');
   const copyBtn = card.querySelector('.dork-copy');
+  const runBtn = card.querySelector('.dork-run');
+  let current = null;
+  const update = () => {
+    const vals = {};
+    card.querySelectorAll('.dork-input').forEach(i => { vals[i.dataset.key] = i.value; });
+    current = dkRender(tpl, vals);
+    code.innerHTML = current.html;
+    copyBtn.disabled = runBtn.disabled = !current.complete;
+    const tip = current.complete ? '' : 'Rellena los campos para generar el dork';
+    copyBtn.title = runBtn.title = tip;
+  };
+  card._update = update;
+  card.querySelectorAll('.dork-input').forEach(inp => {
+    inp.value = DORK_VALS[inp.dataset.key] || '';
+    inp.addEventListener('input', () => {
+      const key = inp.dataset.key;
+      DORK_VALS[key] = inp.value;
+      const scope = card.parentNode;
+      if(scope){
+        scope.querySelectorAll(`.dork-input[data-key="${key}"]`).forEach(o => { if(o!==inp) o.value = inp.value; });
+        scope.querySelectorAll('.dork-card').forEach(c => c._update && c._update());
+      } else update();
+    });
+    inp.addEventListener('keydown', e => { if(e.key==='Enter' && current && current.complete){ e.preventDefault(); runBtn.click(); } });
+  });
   copyBtn.addEventListener('click', () => {
-    navigator.clipboard.writeText(dork.query).then(() => {
+    if(!current || !current.complete) return;
+    navigator.clipboard.writeText(current.text).then(() => {
       copyBtn.textContent = '✓ Copiado';
       copyBtn.classList.add('copied');
       setTimeout(() => { copyBtn.textContent = '📋 Copiar'; copyBtn.classList.remove('copied'); }, 2000);
-    });
+    }).catch(()=>{});
   });
-  card.querySelector('.dork-run').addEventListener('click', () => {
-    window.open(`https://www.google.com/search?q=${encodeURIComponent(dork.query)}`, '_blank');
+  runBtn.addEventListener('click', () => {
+    if(!current || !current.complete) return;
+    window.open(dkGoogleUrl(current.text, dork.img), '_blank', 'noopener');
   });
+  update();
   return card;
+}
+
+function makeDorkHint(){
+  const el = document.createElement('div');
+  el.className = 'dorks-hint';
+  el.innerHTML = '<span>✍️ Escribe el término en el campo de cada tarjeta y el dork se genera solo. Los campos con el mismo nombre se comparten entre tarjetas; varias palabras clave se separan con coma.</span>' +
+                 '<button type="button" class="dorks-clear">🧹 Limpiar campos</button>';
+  el.querySelector('.dorks-clear').addEventListener('click', () => {
+    Object.keys(DORK_VALS).forEach(k => delete DORK_VALS[k]);
+    document.querySelectorAll('.dork-input').forEach(i => { i.value = ''; });
+    document.querySelectorAll('.dork-card').forEach(c => c._update && c._update());
+  });
+  return el;
 }
 
 function makeExtCard(link) {
@@ -1428,6 +1680,7 @@ function renderSection(sec, q) {
     panel.dataset.idx = idx;
 
     if (sub.isDorks) {
+      panel.appendChild(makeDorkHint());
       const grid = document.createElement('div');
       grid.className = 'dorks-grid';
       (sub.dorks||[]).forEach(d => grid.appendChild(makeDorkCard(d, sec.color)));
