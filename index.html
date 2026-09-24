@@ -383,6 +383,12 @@ const RASTRO_TOOLS = [
   {id:'rastro-image', name:'RASTRO · IMAGE', tag:'Imágenes · IMINT', icon:'🖼️', color:'#ea580c',
     desc:'Análisis OSINT de imágenes: hashes de integridad, metadatos EXIF/XMP/IPTC, geolocalización GPS con doble verificación, pivotes de búsqueda inversa, ELA, OCR y detección de códigos QR/barras.',
     url:'https://s3gad3.github.io/rastro-image/', repo:'https://github.com/S3GAD3/rastro-image'},
+  {id:'rastro-person', name:'RASTRO · PERSON', tag:'Personas', icon:'🧑‍💼', color:'#b91c1c',
+    desc:'Organiza investigaciones OSINT sobre personas a partir de nombre, alias o documento: validación de DNI/NIE, matriz de búsquedas con dorks en varios buscadores, cuaderno de evidencias con nivel de confianza para reducir homónimos, grafo de relaciones e informe exportable HTML/TXT/JSON.',
+    url:'https://s3gad3.github.io/rastro-person/', repo:'https://github.com/S3GAD3/rastro-person'},
+  {id:'rastro-link', name:'RASTRO · LINK', tag:'Análisis de Vínculos', icon:'🕸️', color:'#0284c7',
+    desc:'Analiza y representa visualmente entidades, relaciones y evidencias de una investigación: grafo editable (teléfonos, SIM, IMEI, personas, cuentas…), fichas con fuentes y fechas, inventario y análisis estructural, importación JSON/CSV y exportación JSON, CSV, PNG, HTML y PDF. Todo local en el navegador.',
+    url:'https://s3gad3.github.io/rastro-link/', repo:'https://github.com/S3GAD3/rastro-link'},
   {id:'rastro-ads', name:'RASTRO · ADS', tag:'Extensión · Monetización y Ads', icon:'💰', color:'#a66b00', isExtension:true,
     desc:'Extensión de navegador que documenta indicios de monetización, analítica y publicidad en una web: pub-IDs, Google Analytics/GTM, píxeles de Meta/TikTok e identificadores UET. Exporta informe con verificación SHA-256.',
     repo:'https://github.com/S3GAD3/rastro-ads'},
@@ -524,6 +530,8 @@ function buildSuggestions(type, value){
       extCopy('PhishTank', 'https://www.phishtank.com', 'Comprueba si la URL está reportada como phishing.', '#a66b00'),
     ];
     default: return [
+      ownTool('rastro-person','Si es el nombre de una persona: matriz de dorks, cuaderno de evidencias anti-homónimos, grafo e informe.'),
+      ownTool('rastro-link','Para organizar en un grafo las entidades y relaciones que vayas encontrando.'),
       ownTool('rastro-user','Pivote general por nombre, alias o dato de texto libre.'),
       ownTool('rastro-company','Si es un nombre de empresa: valida NIF/CIF y documenta la investigación societaria.'),
       ext('Google (dork)', `https://www.google.com/search?q=${qq}`, 'Busca el dato entrecomillado en toda la web indexada.', '#5d6b78'),
@@ -659,6 +667,10 @@ const SECTIONS = [
 {
   id:'s02',num:'02',title:'Personas',color:'#1e3a5f',
   subs:[
+    {label:'⭐ RASTRO (propia)',links:[
+      {name:'RASTRO · PERSON',url:'https://s3gad3.github.io/rastro-person/',desc:'Investigación por nombre, alias o DNI/NIE: matriz de dorks en varios buscadores, cuaderno de evidencias con nivel de confianza, grafo de relaciones e informe exportable.',tags:['rastro','persona','dorks','homónimos']},
+      {name:'RASTRO · LINK',url:'https://s3gad3.github.io/rastro-link/',desc:'Grafo editable de entidades y relaciones con fichas de evidencia, inventario y análisis estructural. Exporta JSON, CSV, PNG, HTML y PDF.',tags:['rastro','vínculos','grafo']},
+    ]},
     {label:'Búsqueda de Personas',links:[
       {name:'WebMii',url:'https://webmii.com',desc:'Busca información pública de personas en internet: fotos, perfiles sociales, artículos y más.',tags:['personas','perfiles','búsqueda']},
       {name:'NAMINT',url:'https://seintpl.github.io/NAMINT/',desc:'Genera combinaciones de nombres de usuario a partir de nombre y apellidos para buscar en redes.',tags:['username','combinaciones','nombre']},
@@ -1261,6 +1273,9 @@ const SECTIONS = [
 {
   id:'s15',num:'15',title:'Visualización y Análisis',color:'#0e7490',
   subs:[
+    {label:'⭐ RASTRO (propia)',links:[
+      {name:'RASTRO · LINK',url:'https://s3gad3.github.io/rastro-link/',desc:'Grafo editable de entidades (teléfonos, SIM, IMEI, personas, cuentas…) y relaciones con trazabilidad. Vistas de grafo, inventario y análisis estructural; exporta JSON, CSV, PNG, HTML y PDF.',tags:['rastro','vínculos','grafo','análisis']},
+    ]},
     {label:'Mapas Mentales y Grafos',links:[
       {name:'OSINT Tracker',url:'https://app.osintracker.com',desc:'Plataforma de gestión de casos OSINT: organiza evidencias, entidades y relaciones.',tags:['casos','evidencias','gestión']},
       {name:'Draw.io',url:'https://app.diagrams.net/',desc:'Herramienta gratuita para crear diagramas, mapas mentales y grafos de relaciones.',tags:['diagramas','grafos','gratuito']},
